@@ -9,6 +9,29 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+const mongoose = require('mongoose');
+mongoose.Promise = Promise;
+mongoose.connect('mongodb://localhost/mealmaker-v1', {
+    useNewUrlParser: true
+});
+
+app.use(function myMiddleware(req, res, next) {
+    console.log('Hello World!');
+    next();
+});
+
+app.use('/hello', function hello(req, res, next) {
+    res.send('world');
+});
+
+app.post('/ping', function ping(req, res, next) {
+    res.send('pong');
+});
+
+app.get('/authors/:authorId/books/:bookId', function(req, res, next) {
+    res.send('Getting book ' + req.params.bookId + ' by ' + req.params.authorId);
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
