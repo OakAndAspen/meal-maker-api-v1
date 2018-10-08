@@ -14,7 +14,7 @@ const mealsRouter = require('./routes/meals');
 
 // --- MONGOOSE CONFIG ---
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://localhost/mealmaker-v1', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/mealmaker-v1', {
     useNewUrlParser: true
 });
 
@@ -22,7 +22,7 @@ mongoose.connect('mongodb://localhost/mealmaker-v1', {
 const app = express();
 
 // Custom middleware
-app.use((req, res, next)  => {
+app.use((req, res, next) => {
     console.log('Hello World!');
     next();
 });
@@ -32,7 +32,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -44,16 +44,19 @@ app.use('/recipes', recipesRouter);
 app.use('/meals', mealsRouter);
 
 // Catch 404
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // Error handler
-app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  res.status(err.status || 500);
-  res.render('error');
+app.use(function (err, req, res, next) {
+    //res.locals.message = err.message;
+    //res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.status(err.status || 500);
+    //res.render('error');
+    res.send({
+        error: err.message
+    });
 });
 
 module.exports = app;

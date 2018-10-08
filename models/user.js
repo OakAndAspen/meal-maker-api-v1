@@ -4,8 +4,15 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     userName: {
         type: String,
+        required: true
+    },
+    email: {
+        type: String,
         required: true,
-        minlength: [3, 'Username is too short']
+        validate: {
+            validator: value => /^.+@.+\.[a-z]+$/gmi.test(value),
+            message: '{VALUE} is not a valid email address'
+        }
     },
     password: {
         type: String,
