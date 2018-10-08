@@ -14,6 +14,14 @@ const groupSchema = new Schema({
                 required: true
             }
         }
+    ],
+    recipes: [
+        {
+            recipeId: {
+                type: String,
+                required: true
+            }
+        }
     ]
 });
 

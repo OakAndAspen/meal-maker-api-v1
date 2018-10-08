@@ -21,7 +21,25 @@ const userSchema = new Schema({
     registration: {
         type: Date,
         default: Date.now
-    }
+    },
+    notifications: [
+        {
+            date: {
+                type: Date,
+                required: true,
+                default: Date.now()
+            },
+            text: {
+                type: String,
+                required: true
+            },
+            read: {
+                type: Boolean,
+                required: true,
+                default: false
+            }
+        }
+    ]
 });
 
 module.exports = mongoose.model('User', userSchema);

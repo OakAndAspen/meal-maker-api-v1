@@ -11,6 +11,7 @@ const usersRouter = require('./routes/users');
 const groupsRouter = require('./routes/groups');
 const recipesRouter = require('./routes/recipes');
 const mealsRouter = require('./routes/meals');
+const ratingsRouter = require('./routes/ratings');
 
 // --- MONGOOSE CONFIG ---
 mongoose.Promise = Promise;
@@ -36,6 +37,7 @@ app.use('/users', usersRouter);
 app.use('/groups', groupsRouter);
 app.use('/recipes', recipesRouter);
 app.use('/meals', mealsRouter);
+app.use('/ratings', ratingsRouter);
 
 // Catch 404
 app.use(function (req, res, next) {

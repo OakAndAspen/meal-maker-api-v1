@@ -9,6 +9,14 @@ const mealSchema = new Schema({
     recipeId: {
         type: String
     },
+    participants: [
+        {
+            userId: {
+                type: String,
+                required: true
+            }
+        }
+    ],
     date: {
         type: Date,
         required: true
