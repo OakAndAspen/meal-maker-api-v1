@@ -21,12 +21,6 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/mealmaker-v1', 
 // --- APP CONFIG ---
 const app = express();
 
-// Custom middleware
-app.use((req, res, next) => {
-    console.log('Hello World!');
-    next();
-});
-
 // Configuration
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

@@ -2,29 +2,55 @@ const express = require('express');
 const router = express.Router();
 const Meal = require('../models/meal');
 
-/* GET existing meal */
-router.get('/:id', function(req, res, next) {
-    Meal.findById(req.params.id).exec(function(err, meal) {
+/* POST new meal */
+router.post('/', (req, res, next) => {
+    new Meal(req.body).save(function(err, savedMeal) {
         if (err) return next(err);
-        res.send(meal);
+        res.send(savedMeal);
     });
 });
 
+/* GET existing meal */
+router.get('/:id', findMealById, (req, res, next) => {
+    res.send(req.meal);
+});
+
 /* GET all meals */
-router.get('/', function(req, res, next) {
+router.get('/', (req, res, next) => {
     Meal.find().sort('name').exec(function(err, meals) {
         if (err) return next(err);
         res.send(meals);
     });
 });
 
-/* POST new meal */
-router.post('/', function(req, res, next) {
-    const newMeal = new Meal(req.body);
-    newMeal.save(function(err, savedMeal) {
+/* PATCH existing meal */
+router.patch('/:id', findMealById, (req, res, next) => {
+    req.meal.set(req.body);
+    req.meal.save((err, savedMeal) => {
         if (err) return next(err);
+        res.status(200);
         res.send(savedMeal);
     });
 });
+
+/* DELETE existing meal */
+router.delete('/:id', findMealById, (req, res, next) => {
+    req.meal.remove(function(err) {
+        if (err) return next(err);
+        res.sendStatus(204);
+    });
+});
+
+/* --- Middlewares --- */
+function findMealById(req, res, next) {
+    Meal.findById(req.params.id).exec(function(err, meal) {
+        if (err) return next(err);
+        else if (!meal) return res.status(404).send({
+            error: 'No meal found with ID ' + req.params.id
+        });
+        req.meal = meal;
+        next();
+    });
+}
 
 module.exports = router;
