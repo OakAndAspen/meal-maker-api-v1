@@ -10,17 +10,17 @@ const ratingSchema = new Schema({
         type: String,
         required: true
     },
-    ratings: {
-        health: {
-            type: Number,
-            min: 1,
-            max: 5
-        },
-        taste: {
-            type: Number,
-            min: 1,
-            max: 5
-        }
+    health: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    taste: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
     }
 });
 
