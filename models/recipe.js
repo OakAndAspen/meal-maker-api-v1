@@ -44,6 +44,26 @@ const recipeSchema = new Schema({
                 required: true
             }
         }
+    ],
+    ratings: [
+        {
+            userId: {
+                type: String,
+                required: true
+            },
+            health: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            },
+            taste: {
+                type: Number,
+                required: true,
+                min: 1,
+                max: 5
+            }
+        }
     ]
 });
 

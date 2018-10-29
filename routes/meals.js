@@ -2,7 +2,22 @@ const express = require('express');
 const router = express.Router();
 const Meal = require('../models/meal');
 
-/* POST new meal */
+/**
+ * @api {post} /meals Create a new meal
+ * @apiName PostMeal
+ * @apiGroup Meal
+ *
+ * @apiParam {Number}   groupId         Group's id
+ * @apiParam {Number}   recipeId        Recipe's id
+ * @apiParam {DateTime} date            Date
+ * @apiParam {Object[]} participants    Participating users
+ * @apiParam {Number}   participants.id User's id
+ *
+ * @apiSuccess (200)    Success     Group was created.
+ *
+ * @apiError (404)  UserNotFound    User with id {id} was not found.
+ * @apiError (404)  RecipeNotFound  Recipe with id {id} was not found.
+ */
 router.post('/', (req, res, next) => {
     new Meal(req.body).save(function(err, savedMeal) {
         if (err) return next(err);
@@ -10,12 +25,37 @@ router.post('/', (req, res, next) => {
     });
 });
 
-/* GET existing meal */
+/**
+ * @api {get} /meals/:id Request a meal's info
+ * @apiName GetMeal
+ * @apiGroup Meal
+ *
+ * @apiSuccess {Number}     id                      Id
+ * @apiSuccess {Date}       date                    Date
+ * @apiSuccess {Object[]}   recipe                  Recipe
+ * @apiSuccess {Number}     recipe.id               Recipe'id
+ * @apiSuccess {String}     recipe.name             Recipe's name
+ * @apiSuccess {Object[]}   participants            Participating users
+ * @apiSuccess {Number}     participants.id         User's id
+ * @apiSuccess {Number}     participants.userName   User's name
+ *
+ * @apiError (404)  MealNotFound   Meal with id {id} was not found.
+ */
 router.get('/:id', findMealById, (req, res, next) => {
     res.send(req.meal);
 });
 
-/* GET all meals */
+/**
+ * @api {get} /meals Request a list of meals
+ * @apiName GetMeals
+ * @apiGroup Meal
+ *
+ * @apiSuccess {Number}     id                      Id
+ * @apiSuccess {Date}       date                    Date
+ * @apiSuccess {Object[]}   recipe                  Recipe
+ * @apiSuccess {Number}     recipe.id               Recipe'id
+ * @apiSuccess {String}     recipe.name             Recipe's name
+ */
 router.get('/', (req, res, next) => {
     Meal.find().sort('name').exec(function(err, meals) {
         if (err) return next(err);
@@ -23,7 +63,21 @@ router.get('/', (req, res, next) => {
     });
 });
 
-/* PATCH existing meal */
+/**
+ * @api {patch} /meals:id  Update an existing meal
+ * @apiName PatchMeal
+ * @apiGroup Meal
+ *
+ * @apiParam {Number}   recipeId        Recipe's id
+ * @apiParam {DateTime} date            Date
+ * @apiParam {Object[]} participants    Participating users
+ * @apiParam {Number}   participants.id User's id
+ *
+ * @apiSuccess (200)    Success     Group was updated.
+ *
+ * @apiError (404)  UserNotFound    User with id {id} was not found.
+ * @apiError (404)  RecipeNotFound  Recipe with id {id} was not found.
+ */
 router.patch('/:id', findMealById, (req, res, next) => {
     req.meal.set(req.body);
     req.meal.save((err, savedMeal) => {
@@ -33,7 +87,15 @@ router.patch('/:id', findMealById, (req, res, next) => {
     });
 });
 
-/* DELETE existing meal */
+/**
+ * @api {delete} /meals:id  Delete a meal
+ * @apiName DeleteMeal
+ * @apiGroup Meal
+ *
+ * @apiSuccess (200)    Success     Meal was deleted.
+ *
+ * @apiError (404)  MealNotFound   Meal with id {id} was not found.
+ */
 router.delete('/:id', findMealById, (req, res, next) => {
     req.meal.remove(function(err) {
         if (err) return next(err);
