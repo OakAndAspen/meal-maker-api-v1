@@ -1,5 +1,154 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/login",
+    "title": "Log in",
+    "name": "Login",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "userName",
+            "description": "<p>Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>JWT token</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "UserNotFound",
+            "description": "<p>User was not found</p>"
+          }
+        ],
+        "406": [
+          {
+            "group": "406",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>The username or password is missing</p>"
+          },
+          {
+            "group": "406",
+            "optional": false,
+            "field": "PasswordIncorrect",
+            "description": "<p>The password is incorrect</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/signup",
+    "title": "Sign up",
+    "name": "Signup",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "email",
+            "description": "<p>Email address</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "userName",
+            "description": "<p>Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "user",
+            "description": "<p>User's info</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>The email, username or password is missing</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "PasswordInvalid",
+            "description": "<p>The password must be at least 6 characters long and contain a letter and a number</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "EmailAlreadyExists",
+            "description": "<p>The email already exists</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "UsernameAlreadyExists",
+            "description": "<p>The username already exists</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/index.js",
+    "groupTitle": "Authentication"
+  },
+  {
     "type": "delete",
     "url": "/groups:id",
     "title": "Delete a group",
@@ -1126,81 +1275,6 @@ define({ "api": [
             "optional": false,
             "field": "UserNotFound",
             "description": "<p>User with id {id} was not found.</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "routes/users.js",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/users",
-    "title": "Create a new user",
-    "name": "PostUser",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": "<p>Email address</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "userName",
-            "description": "<p>Username</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Password</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "200": [
-          {
-            "group": "200",
-            "optional": false,
-            "field": "Success",
-            "description": "<p>User was created.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "406": [
-          {
-            "group": "406",
-            "optional": false,
-            "field": "PasswordInvalid",
-            "description": "<p>The password must be at least 6 characters long and contain a letter and a number</p>"
-          }
-        ],
-        "409": [
-          {
-            "group": "409",
-            "optional": false,
-            "field": "EmailAlreadyExists",
-            "description": "<p>The email already exists</p>"
-          },
-          {
-            "group": "409",
-            "optional": false,
-            "field": "UsernameAlreadyExists",
-            "description": "<p>The username already exists</p>"
           }
         ]
       }

@@ -5,6 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -32,10 +33,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routers
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/groups', groupsRouter);
-app.use('/recipes', recipesRouter);
-app.use('/meals', mealsRouter);
+app.use('/users', authenticate, usersRouter);
+app.use('/groups', authenticate, groupsRouter);
+app.use('/recipes', authenticate, recipesRouter);
+app.use('/meals', authenticate, mealsRouter);
 
 // Catch 404
 app.use(function (req, res, next) {
@@ -47,5 +48,23 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.send({error: err.message});
 });
+
+// Authentication middleware
+function authenticate (req, res, next) {
+    // Check the header
+    const authorization = req.get('Authorization');
+    if (!authorization) return res.status(403).send({error: 'NoAuthHeader'});
+    const match = authorization.match(/^Bearer (.+)$/);
+    if (!match) return res.status(403).send({error: 'WrongAuthHeader'});
+
+    // Verify token
+    const token = match[1];
+    const secretKey = process.env.SECRET_KEY || 'changeme';
+    jwt.verify(token, secretKey, function (err, payload) {
+        if (err) return res.status(403).send({error: 'TokenInvalid'});
+        req.userId = payload.sub;
+        next();
+    });
+}
 
 module.exports = app;
