@@ -1,24 +1,54 @@
 const express = require('express');
 const router = express.Router();
 const Group = require('../models/group');
+const User = require('../models/user');
 
 /**
  * @api {post} /groups Create a new group
  * @apiName PostGroup
  * @apiGroup Group
  *
- * @apiParam {String}   name        Group name
- * @apiParam {Object[]} users       Participating users
- * @apiParam {Number}   users.id    User's id
+ * @apiParam {String}   name    Group name
+ * @apiParam {String[]} members Participating users' ids
  *
- * @apiSuccess (200)    Success     Group was created.
+ * @apiParamExample
+ * {
+ *     name: "Stanton family"
+ *     members: [5bbb621c4d7da43f508b9d5a, 5bbb61284d7da43f508b9d59, 5bd7083ed584b00d1c768f2e]
+ * }
  *
- * @apiError (404)  UserNotFound    User with id {id} was not found.
+ * @apiSuccess (201) {String}   name        Group name
+ * @apiSuccess (201) {String[]} members     Participating users ids
+ * @apiSuccess (201) {String[]} recipes     Recipes ids
+ *
+ * @apiSuccessExample
+ * {
+ *     name: "Stanton family"
+ *     members: [5bbb621c4d7da43f508b9d5a, 5bbb61284d7da43f508b9d59, 5bd7083ed584b00d1c768f2e],
+ *     recipes: []
+ * }
+ *
+ * @apiError (404)  UserNotFound        User was not found
+ * @apiError (400)  NameTooShort        Name is too short
+ * @apiError (400)  NotEnoughMembers    Not enough members in the group
  */
 router.post('/', (req, res, next) => {
-    new Group(req.body).save(function(err, savedGroup) {
+    let name = req.body.name;
+    let membersIds = req.body.members;
+
+    if (!name || name.length < 3) return next({status: 400, message: 'NameTooShort'});
+    if (!membersIds.includes(req.userId)) membersIds.push(req.userId);
+    if (!membersIds || membersIds.length < 2) return next({status: 400, message: 'NotEnoughMembers'});
+
+
+    User.where('_id').in(membersIds).find((err, members) => {
         if (err) return next(err);
-        res.send(savedGroup);
+        if (members.length !== membersIds.length) return next({status: 404, message: 'UserNotFound'});
+
+        new Group({name: name, members: membersIds}).save((err, group) => {
+            if (err) return next(err);
+            return res.status(201).send(group);
+        });
     });
 });
 
@@ -52,7 +82,7 @@ router.get('/:id', findGroupById, (req, res, next) => {
  * @apiSuccess {String}     groups.name          The group's name
  */
 router.get('/', (req, res, next) => {
-    Group.find().sort('name').exec(function(err, groups) {
+    Group.find().sort('name').exec(function (err, groups) {
         if (err) return next(err);
         res.send(groups);
     });
@@ -94,7 +124,7 @@ router.patch('/:id', findGroupById, (req, res, next) => {
  * @apiError (404)  GroupNotFound   Group with id {id} was not found.
  */
 router.delete('/:id', findGroupById, (req, res, next) => {
-    req.group.remove(function(err) {
+    req.group.remove(function (err) {
         if (err) return next(err);
         res.sendStatus(204);
     });
@@ -102,7 +132,7 @@ router.delete('/:id', findGroupById, (req, res, next) => {
 
 /* --- Middlewares --- */
 function findGroupById(req, res, next) {
-    Group.findById(req.params.id).exec(function(err, group) {
+    Group.findById(req.params.id).exec(function (err, group) {
         if (err) return next(err);
         else if (!group) return res.status(404).send({
             error: 'No group found with ID ' + req.params.id

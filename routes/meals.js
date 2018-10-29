@@ -13,15 +13,21 @@ const Meal = require('../models/meal');
  * @apiParam {Object[]} participants    Participating users
  * @apiParam {Number}   participants.id User's id
  *
- * @apiSuccess (200)    Success     Group was created.
+ * @apiSuccess (201) {Number}   groupId         Group's id
+ * @apiSuccess (201) {Number}   recipeId        Recipe's id
+ * @apiSuccess (201) {DateTime} date            Date
+ * @apiSuccess (201) {Object[]} participants    Participating users
+ * @apiSuccess (201) {Number}   participants.id User's id
  *
- * @apiError (404)  UserNotFound    User with id {id} was not found.
- * @apiError (404)  RecipeNotFound  Recipe with id {id} was not found.
+ * @apiError (404)  UserNotFound    User was not found
+ * @apiError (404)  RecipeNotFound  Recipe was not found
+ * @apiError (400)  DateInvalid     Date is invalid
+ * @apiError (400)  NoParticipants  No participants
  */
 router.post('/', (req, res, next) => {
-    new Meal(req.body).save(function(err, savedMeal) {
+    new Meal(req.body).save(function(err, meal) {
         if (err) return next(err);
-        res.send(savedMeal);
+        return res.status(201).send(meal);
     });
 });
 

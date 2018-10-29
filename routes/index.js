@@ -45,7 +45,7 @@ router.post('/signup', (req, res, next) => {
                 if (err) return next(err);
                 new User({email: email, userName: userName, password: hashedPassword}).save((err, user) => {
                     if (err) return next(err);
-                    return res.send(user);
+                    return res.status(201).send(user);
                 });
             });
         });

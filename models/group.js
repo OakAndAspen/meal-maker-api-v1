@@ -7,22 +7,14 @@ const groupSchema = new Schema({
         required: true,
         minlength: [3, 'Name is too short']
     },
-    members: [
-        {
-            userId: {
-                type: String,
-                required: true
-            }
-        }
-    ],
-    recipes: [
-        {
-            recipeId: {
-                type: String,
-                required: true
-            }
-        }
-    ]
+    members: {
+        type: Array,
+        required: true,
+        minlength: 2
+    },
+    recipes: {
+        type: Array
+    }
 });
 
 module.exports = mongoose.model('Group', groupSchema);

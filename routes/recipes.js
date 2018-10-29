@@ -7,19 +7,24 @@ const Recipe = require('../models/recipe');
  * @apiName PostRecipe
  * @apiGroup Recipe
  *
- * @apiParam {Number}   authorId    The recipe's author's id
- * @apiParam {String}   name        The recipe's name
- * @apiParam {String}   description The recipe's description
- * @apiParam {String}   imgUrl      The recipe's image url
+ * @apiParam {Number}   authorId    Author's id
+ * @apiParam {String}   name        Name
+ * @apiParam {String}   description Description
+ * @apiParam {String}   imgUrl      Image URL
  *
- * @apiSuccess (200)    Success     Recipe was created.
+ * @apiSuccess (201) {Number}   authorId    Author's id
+ * @apiSuccess (201) {String}   name        Name
+ * @apiSuccess (201) {String}   description Description
+ * @apiSuccess (201) {String}   imgUrl      Image URL
  *
- * @apiError (404)  UserNotFound    User with id {id} was not found.
+ * @apiError (404)  UserNotFound        User was not found
+ * @apiError (404)  NameTooShort        Name is too short
+ * @apiError (404)  DescriptionTooShort Description is too short
  */
 router.post('/', (req, res, next) => {
-    new Recipe(req.body).save(function(err, savedRecipe) {
+    new Recipe(req.body).save(function(err, recipe) {
         if (err) return next(err);
-        res.send(savedRecipe);
+        return res.status(201).send(recipe);
     });
 });
 
