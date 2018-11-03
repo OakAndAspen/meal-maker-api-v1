@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Group = require('../models/group');
 const User = require('../models/user');
+const Recipe = require('../models/recipe');
 
 /**
  * @api {post} /groups Create a new group
@@ -40,7 +41,6 @@ router.post('/', (req, res, next) => {
     if (!membersIds.includes(req.userId)) membersIds.push(req.userId);
     if (!membersIds || membersIds.length < 2) return next({status: 400, message: 'NotEnoughMembers'});
 
-
     User.where('_id').in(membersIds).find((err, members) => {
         if (err) return next(err);
         if (members.length !== membersIds.length) return next({status: 404, message: 'UserNotFound'});
@@ -68,12 +68,12 @@ router.post('/', (req, res, next) => {
  *
  * @apiError (404)  GroupNotFound   Group with id {id} was not found.
  */
-router.get('/:id', findGroupById, (req, res, next) => {
-    res.send(req.group);
+router.get('/:id', getGroup, (req, res) => {
+    return res.send(req.group);
 });
 
 /**
- * @api {get} /groups Request a list of groups
+ * @api {get} /groups Request a list of all groups the user is in
  * @apiName GetGroups
  * @apiGroup Group
  *
@@ -82,7 +82,7 @@ router.get('/:id', findGroupById, (req, res, next) => {
  * @apiSuccess {String}     groups.name          The group's name
  */
 router.get('/', (req, res, next) => {
-    Group.find().sort('name').exec(function (err, groups) {
+    Group.find({members: req.userId}).sort('name').exec((err, groups) => {
         if (err) return next(err);
         res.send(groups);
     });
@@ -105,13 +105,47 @@ router.get('/', (req, res, next) => {
  * @apiError (404)  UserNotFound    User with id {id} was not found.
  * @apiError (404)  RecipeNotFound  Recipe with id {id} was not found.
  */
-router.patch('/:id', findGroupById, (req, res, next) => {
-    req.group.set(req.body);
-    req.group.save((err, savedGroup) => {
-        if (err) return next(err);
-        res.status(200);
-        res.send(savedGroup);
+router.patch('/:id', getGroup, (req, res, next) => {
+    let group = req.group;
+    let name = req.body.name || null;
+    let members = req.body.members || null;
+    let recipes = req.body.recipes || null;
+
+    // Update the name
+    if (name) {
+        if (name.length < 3) return res.status(400).send('NameTooShort');
+        else group.name = name;
+    }
+
+    // Update the members
+    let uM = new Promise((resolve) => {
+        if (!members) return resolve(group.members);
+        if (members.length < 2) return res.status(400).send('NotEnoughMembers');
+        User.where('_id').in(members).find((err, existingMembers) => {
+            if (err) return next(err);
+            if (members.length !== existingMembers.length) return res.status(404).send('UserNotFound');
+            group.members = members;
+            return resolve();
+        });
     });
+
+    // Update the recipes
+    let uR = new Promise((resolve) => {
+        if (!recipes) return resolve(group.recipes);
+        Recipe.where('_id').in(recipes).find((err, existingRecipes) => {
+            if (err) return next(err);
+            if (recipes.length !== existingRecipes.length) return res.status(404).send('RecipeNotFound');
+            group.recipes = recipes;
+            return resolve();
+        });
+    });
+
+    Promise.all([uM, uR]).then(() => {
+        group.save((err, group) => {
+            if (err) return next(err);
+            return res.status(201).send(group);
+        });
+    })
 });
 
 /**
@@ -123,20 +157,21 @@ router.patch('/:id', findGroupById, (req, res, next) => {
  *
  * @apiError (404)  GroupNotFound   Group with id {id} was not found.
  */
-router.delete('/:id', findGroupById, (req, res, next) => {
+router.delete('/:id', getGroup, (req, res, next) => {
     req.group.remove(function (err) {
         if (err) return next(err);
-        res.sendStatus(204);
+        return res.sendStatus(204);
     });
 });
 
 /* --- Middlewares --- */
-function findGroupById(req, res, next) {
+function getGroup(req, res, next) {
     Group.findById(req.params.id).exec(function (err, group) {
         if (err) return next(err);
-        else if (!group) return res.status(404).send({
-            error: 'No group found with ID ' + req.params.id
-        });
+        // Checking if group exists
+        if (!group) return res.status(404).send({error: 'GroupNotFound'});
+        // Checking if current user is a member of that group
+        if (!group.members.includes(req.userId)) return res.sendStatus(403);
         req.group = group;
         next();
     });

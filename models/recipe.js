@@ -17,7 +17,7 @@ const recipeSchema = new Schema({
         type: Number,
         required: true
     },
-    ingredients: [
+    /*ingredients: [
         {
             name: {
                 type: String,
@@ -44,7 +44,7 @@ const recipeSchema = new Schema({
                 required: true
             }
         }
-    ],
+    ],*/
     ratings: [
         {
             userId: {

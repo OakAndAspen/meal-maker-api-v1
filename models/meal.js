@@ -9,14 +9,11 @@ const mealSchema = new Schema({
     recipeId: {
         type: String
     },
-    participants: [
-        {
-            userId: {
-                type: String,
-                required: true
-            }
-        }
-    ],
+    participants: {
+        type: Array,
+        required: true,
+        minlength: [1, 'A meal must contain at least one participant']
+    },
     date: {
         type: Date,
         required: true

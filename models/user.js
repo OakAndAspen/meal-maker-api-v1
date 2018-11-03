@@ -21,7 +21,7 @@ const userSchema = new Schema({
     registration: {
         type: Date,
         default: Date.now
-    },
+    }/*,
     notifications: [
         {
             date: {
@@ -39,7 +39,7 @@ const userSchema = new Schema({
                 default: false
             }
         }
-    ]
+    ]*/
 });
 
 userSchema.set('toJSON', {transform: transformJsonUser});

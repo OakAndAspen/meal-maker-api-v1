@@ -10,7 +10,7 @@ const groupSchema = new Schema({
     members: {
         type: Array,
         required: true,
-        minlength: 2
+        minlength: [2, 'A group must contain at least two members']
     },
     recipes: {
         type: Array
