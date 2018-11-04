@@ -9,11 +9,27 @@ const jwt = require('jsonwebtoken');
  * @apiName Signup
  * @apiGroup Authentication
  *
- * @apiParam {String}   [email]       Email address
+ * @apiParam {String}   email       Email address
  * @apiParam {String}   userName    Username
  * @apiParam {String}   password    Password
  *
- * @apiSuccess {Object[]}   user    User's info
+ * @apiParamExample
+ * {
+ *     email: "joe@stanton.xyz",
+ *     userName: "TheGreatestJoe"
+ *     password: "123456isNotASecurePassword"
+ * }
+ *
+ * @apiSuccess {String}   email         Email
+ * @apiSuccess {String}   userName      Username
+ * @apiSuccess {String}   registration  Registration date
+ *
+ * @apiSuccessExample
+ * {
+ *     email: "joe@stanton.xyz",
+ *     userName: "TheGreatestJoe"
+ *     registration: "2018-11-02 16:33:23"
+ * }
  *
  * @apiError (400)  MissingData             The email, username or password is missing
  * @apiError (400)  PasswordInvalid         The password must be at least 6 characters long and contain a letter and a number
@@ -27,19 +43,19 @@ router.post('/signup', (req, res, next) => {
 
     // Check for missing data
     if (!email || !userName || !password) {
-        return next({status: 406, message: 'MissingData'});
+        return res.status(400).send('MissingData');
     }
     // Check for invalid password
     if (password.length < 6 || !password.match(/\d/g) || !password.match(/[a-zA-z]/g)) {
-        return next({status: 406, message: 'PasswordInvalid'});
+        return res.status(400).send('PasswordInvalid');
     }
     // Check for existing email or username
     User.where({'email': email}).findOne((err, user) => {
         if (err) return next(err);
-        if (user) return next({status: 409, message: 'EmailAlreadyExists'});
+        if (user) return res.status(400).send('EmailAlreadyExists');
         User.where({'userName': userName}).findOne((err, user) => {
             if (err) return next(err);
-            if (user) return next({status: 409, message: 'UsernameAlreadyExists'});
+            if (user) return res.status(400).send('UsernameAlreadyExists');
             // Create the user
             bcrypt.hash(password, 10, (err, hashedPassword) => {
                 if (err) return next(err);
@@ -60,35 +76,46 @@ router.post('/signup', (req, res, next) => {
  * @apiParam {String}   userName    Username
  * @apiParam {String}   password    Password
  *
+ * @apiParamExample
+ * {
+ *     userName: "TheGreatestJoe",
+ *     password: "123456isNotASecurePassword"
+ * }
+ *
  * @apiSuccess {String} token JWT token
  *
- * @apiError (406)  MissingData         The username or password is missing
+ * @apiSuccessExample
+ * {
+ *     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+ * }
+ *
+ * @apiError (400)  MissingData         The username or password is missing
  * @apiError (404)  UserNotFound        User was not found
- * @apiError (406)  PasswordIncorrect   The password is incorrect
+ * @apiError (400)  PasswordIncorrect   The password is incorrect
  */
 router.post('/login', (req, res, next) => {
     let userName = req.body.userName;
     let password = req.body.password;
 
     // Check for missing data
-    if (!userName || !password) return res.status(406).send({'error': 'MissingData'});
+    if (!userName || !password) return res.status(400).send('MissingData');
 
     // Find the user
     User.where({userName: userName}).findOne((err, user) => {
         if (err) return next(err);
-        if (!user) return res.status(404).send({'error': 'UserNotFound'});
+        if (!user) return res.status(404).send('UserNotFound');
 
         // Check the password
         bcrypt.compare(password, user.password, (err, valid) => {
             if (err) return next(err);
-            if (!valid) return next({status: 406, message: 'PasswordIncorrect'});
+            if (!valid) return res.status(400).send('PasswordIncorrect');
 
             // Create and send JWT token
             const secretKey = process.env.SECRET_KEY || 'changeme';
             const exp = (new Date().getTime() + 7 * 24 * 3600 * 1000) / 1000;
             jwt.sign({sub: user._id, exp: exp}, secretKey, (err, token) => {
                 if (err) return next(err);
-                return res.send({token:token});
+                return res.status(200).send({token:token});
             });
         });
     });
