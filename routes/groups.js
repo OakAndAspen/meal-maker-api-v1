@@ -15,7 +15,7 @@ const Recipe = require('../models/recipe');
  * @apiParamExample
  * {
  *     name: "Stanton family"
- *     members: [5bbb621c4d7da43f508b9d5a, 5bbb61284d7da43f508b9d59, 5bd7083ed584b00d1c768f2e]
+ *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"]
  * }
  *
  * @apiSuccess (201) {String}   name        Group name
@@ -24,8 +24,8 @@ const Recipe = require('../models/recipe');
  *
  * @apiSuccessExample
  * {
- *     name: "Stanton family"
- *     members: [5bbb621c4d7da43f508b9d5a, 5bbb61284d7da43f508b9d59, 5bd7083ed584b00d1c768f2e],
+ *     name: "Stanton family",
+ *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"],
  *     recipes: []
  * }
  *
@@ -57,14 +57,35 @@ router.post('/', (req, res, next) => {
  * @apiName GetGroup
  * @apiGroup Group
  *
- * @apiSuccess {Number}     id              Id
+ * @apiParam {Number} id Group id
+ *
+ * @apiParamExample
+ * {
+ *    id: "7cd5621c4d7da43f508b9d5a"
+ * }
+ *
+ * @apiSuccess {String}     id              Id
  * @apiSuccess {String}     name            Name
  * @apiSuccess {Object[]}   recipes         Recipes
- * @apiSuccess {Number}     recipes.id      Recipe's id
- * @apiSuccess {Number}     recipes.name    Recipe's name
+ * @apiSuccess {String}     recipes.id      Recipe's id
+ * @apiSuccess {String}     recipes.name    Recipe's name
  * @apiSuccess {Object[]}   members         Participating users
- * @apiSuccess {Number}     members.id      User's id
- * @apiSuccess {Number}     members.name    User's name
+ * @apiSuccess {String}     members.id      User's id
+ * @apiSuccess {String}     members.name    User's name
+ *
+ * @apiSuccessExample
+ * {
+ *     id: "7zui621c4d7da43f508b9d5a",
+ *     name: "The group of awesome",
+ *     recipes: [
+ *       {id: "7zui621c4d7da43f508b9d5a", name: "Some recipe"},
+ *       {id: "7zui621c4d7da43f508b9d4d", name: "Some other recipe"}
+ *     ],
+ *     members: [
+ *       {id: "5ccc621c4d7da43f508b9d5a", name: "Dad"}
+ *       {id: "5ccc621c4d7da43f508b6f8g", name: "Mom"}
+ *     ]
+ * }
  *
  * @apiError (404)  GroupNotFound   Group with id {id} was not found.
  */
@@ -78,8 +99,17 @@ router.get('/:id', getGroup, (req, res) => {
  * @apiGroup Group
  *
  * @apiSuccess {Object[]}   groups               List of groups
- * @apiSuccess {Number}     groups.id            The group's id
+ * @apiSuccess {String}     groups.id            The group's id
  * @apiSuccess {String}     groups.name          The group's name
+ *
+ * @apiSuccessExample
+ * {
+ *     groups: [
+ *       {id: "7zui621c4d7da43f508b9d5a", name: "Family"}
+ *       {id: "7c89621c4d7da43f508b9d5a", name: "Friends"}
+ *       {id: "7c89621c4d7da43f5080dh48", name: "Mighty beagles"}
+ *     ]
+ * }
  */
 router.get('/', (req, res, next) => {
     Group.find({members: req.userId}).sort('name').exec((err, groups) => {
@@ -89,15 +119,20 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {patch} /groups:id  Update an existing group
+ * @api {patch} /groups/:id  Update an existing group
  * @apiName PatchGroup
  * @apiGroup Group
  *
  * @apiParam {String}   name        Group name
- * @apiParam {Object[]} users       Participating users
- * @apiParam {Number}   users.id    The user's id
- * @apiParam {Object[]} recipes     The group's recipes
- * @apiParam {Number}   recipes.id  The recipe's id
+ * @apiParam {String[]} members       Participating users
+ * @apiParam {String[]} recipes     The group's recipes
+ *
+ * @apiParamExample
+ * {
+ *     name: "Group's name",
+ *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"]],
+ *     recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a"]
+ * }
  *
  * @apiSuccess (200)    Success     Group was updated.
  *
@@ -152,6 +187,11 @@ router.patch('/:id', getGroup, (req, res, next) => {
  * @api {delete} /groups:id  Delete a group
  * @apiName DeleteGroup
  * @apiGroup Group
+ *
+ * @apiParamExample
+ * {
+ *     id: "5bbb621c4d7da43f508b9d5a"
+ * }
  *
  * @apiSuccess (200)    Success     Group was deleted.
  *

@@ -13,10 +13,26 @@ const Group = require('../models/group');
  * @apiParam {String}   description Description
  * @apiParam {String}   imgUrl      Image URL
  *
+ * @apiParamExample
+ * {
+ *     authorId: "5bbb621c4d7da43f508b9d5a",
+ *     name: "Fancy recipe",
+ *     description: "This will be good... probably",
+ *     imgUrl: "//cdn.myapp.net/img/jhsdfo4837f.jpg"
+ * }
+ *
  * @apiSuccess (201) {Number}   authorId    Author's id
  * @apiSuccess (201) {String}   name        Name
  * @apiSuccess (201) {String}   description Description
  * @apiSuccess (201) {String}   imgUrl      Image URL
+ *
+ * @apiSuccessExample
+ * {
+ *     authorId: "5bbb621c4d7da43f508b9d5a",
+ *     name: "Fancy recipe",
+ *     description: "This will be good... probably",
+ *     imgUrl: "https://cdn.myapp.net/img/jhsdfo4837f.jpg"
+ * }
  *
  * @apiError (404)  UserNotFound        User was not found
  * @apiError (404)  NameTooShort        Name is too short
@@ -52,13 +68,30 @@ router.post('/', (req, res, next) => {
  * @apiName GetRecipe
  * @apiGroup Recipe
  *
- * @apiSuccess {Number}     id                  Id
+ * @apiParamSuccess
+ * {
+ *     id: "5bbb621c4d7da43f508b9d5a"
+ * }
+ *
+ * @apiSuccess {String}     id                  Id
  * @apiSuccess {String}     name                Name
- * @apiSuccess {Object[]}   author              Author
- * @apiSuccess {Number}     author.id           The author's id
+ * @apiSuccess {Object}     author              Author
+ * @apiSuccess {String}     author.id           The author's id
  * @apiSuccess {String}     author.userName     The author's name
  * @apiSuccess {String}     description         Description
  * @apiSuccess {String}     imgUrl              Image URL
+ *
+ * @apiSuccessExample
+ * {
+ *   id: "5bbb621c4d7da43f508b9d5a",
+ *   name: "Fancy recipe for fancy people",
+ *   author: {
+ *     id: "7zui621c4d7da43f508b9d5a",
+ *     userName: "Dad"
+ *   },
+ *   description: "This is probably good, or so they say",
+ *   imgUrl: "https://cdn.myapp.net/img/jhsdfo4837f.jpg"
+ * }
  *
  * @apiError (404)  RecipeNotFound    Recipe with id {id} was not found.
  */
@@ -81,9 +114,23 @@ router.get('/:id', findRecipeById, (req, res, next) => {
  * @apiSuccess {Object[]}   recipes                 List of recipes
  * @apiSuccess {Number}     recipes.id              The recipe's id
  * @apiSuccess {String}     recipes.name            The recipe's name
- * @apiSuccess {Object[]}   recipes.author          The recipe's author
- * @apiSuccess {Number}     recipes.author.id       The author's id
- * @apiSuccess {Number}     recipes.author.userName The author's username
+ * @apiSuccess {Object}     recipes.author          The recipe's author
+ * @apiSuccess {String}     recipes.author.id       The author's id
+ * @apiSuccess {String}     recipes.author.userName The author's username
+ *
+ * @apiSuccessExample
+ * {
+ *     recipes: [
+ *       {
+ *          id: "7zui621c4d7da43f508b9d5a",
+ *          name: "Recipe 1",
+ *          author: {
+ *            id: "5bbb621c4d7da43f508b9d5a",
+ *            userName: "TheGreatJoe"
+ *          }
+ *        }
+ *     ]
+ * }
  */
 router.get('/', (req, res, next) => {
     let filter = req.body.filter;
@@ -122,9 +169,14 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {patch} /recipes:id  Update an existing recipe
+ * @api {patch} /recipes/:id  Update an existing recipe
  * @apiName PatchRecipe
  * @apiGroup Recipe
+ *
+ * @apiParamExample
+ * {
+ *     id: "7zui621c4d7da43f508b9d5a
+ * }
  *
  * @apiParam {String}   name                Name
  * @apiParam {String}   description         Description
@@ -133,6 +185,17 @@ router.get('/', (req, res, next) => {
  * @apiParam {Number}   ratings.userId      Rating's user's id
  * @apiParam {Number}   ratings.health      Rating's health value
  * @apiParam {Number}   ratings.taste       Rating's taste value
+ *
+ * @apiParamExample
+ * {
+ *     name: "Recipe's name",
+ *     description: "Some awesome recipe",
+ *     imgUrl: "https://images.xyz/image.jpg",
+ *     ratings: [
+ *       {userId: "5bbb621c4d7da43f508b9d5a", health: 5, taste: 2}
+ *       {userId: "5bbb61284d7da43f508b9d59", health: 1, taste: 5}
+ *     ]
+ * }
  *
  * @apiSuccess (200)    Success     Recipe was updated.
  *
@@ -163,9 +226,14 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
 });
 
 /**
- * @api {delete} /recipes:id  Delete a recipe
+ * @api {delete} /recipes/:id  Delete a recipe
  * @apiName DeleteRecipe
  * @apiGroup Recipe
+ *
+ * @apiParamExample
+ * {
+ *     id: "7zui621c4d7da43f508b9d5a"
+ * }
  *
  * @apiSuccess (200)    Success     Recipe was deleted.
  *

@@ -7,8 +7,19 @@ const User = require('../models/user');
  * @apiName GetUser
  * @apiGroup User
  *
+ * @apiParamExample
+ * {
+ *     id: "5bbb621c4d7da43f508b9d5a"
+ * }
+ *
  * @apiSuccess {String} userName    Username
  * @apiSuccess {String} email       Email address
+ *
+ * @apiSuccessExample
+ * {
+ *     userName: "TheAwesomeUser",
+ *     email: "awesome@stanton.xyz"
+ * }
  *
  * @apiError (404)  UserNotFound    User with id {id} was not found.
  */
@@ -24,6 +35,15 @@ router.get('/:id', findUserById, (req, res, next) => {
  * @apiSuccess {Object[]}   users           List of users
  * @apiSuccess {Number}     users.id        Id
  * @apiSuccess {String}     users.userName  Username
+ *
+ * @apiSuccessExample
+ * {
+ *     users: [
+ *       {id: "5bbb621c4d7da43f508b9d5a", userName: "TheAwesomeUser"}
+ *       {id: "5bbb61284d7da43f508b9d59", userName: "TheOtherAwesomeUser"}
+ *       {id: "5bd7083ed584b00d1c768f2e", userName: "YetAgainAnAwesomeUser"}
+ *     ]
+ * }
  */
 router.get('/', (req, res, next) => {
     User.find().sort('userName').exec(function (err, users) {
@@ -41,8 +61,20 @@ router.get('/', (req, res, next) => {
  * @apiParam {String}   userName  Username
  * @apiParam {String}   password  Password
  *
+ * @apiParamExample
+ * {
+ *     id: 5bd7083ed584b00d1c768f2e
+ * }
+ *
  * @apiSuccess {String} userName    Username
  * @apiSuccess {String} email       Email address
+ *
+ * @apiSuccessExample
+ * {
+ *     email: "joe@stanton.xyz",
+ *     userName: "TheAwesomeUser",
+ *     password: "AtLeastThisOneIsEasyToRemember"
+ * }
  *
  * @apiError (404) UserNotFound User with id {id} was not found.
  */
@@ -59,6 +91,11 @@ router.patch('/:id', findUserById, (req, res, next) => {
  * @api {delete} /users/:id Delete a user
  * @apiName DeleteUser
  * @apiGroup User
+ *
+ * @apiParamExample
+ * {
+ *     id: "5bbb621c4d7da43f508b9d5a"
+ * }
  *
  * @apiSuccess (200)    Success     User was deleted.
  *
