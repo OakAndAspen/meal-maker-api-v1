@@ -37,13 +37,13 @@ router.post('/', (req, res, next) => {
     let name = req.body.name;
     let membersIds = req.body.members;
 
-    if (!name || name.length < 3) return next({status: 400, message: 'NameTooShort'});
+    if (!name || name.length < 3) return res.status(400).send('NameTooShort');
     if (!membersIds.includes(req.userId)) membersIds.push(req.userId);
-    if (!membersIds || membersIds.length < 2) return next({status: 400, message: 'NotEnoughMembers'});
+    if (!membersIds || membersIds.length < 2) return res.status(400).send('NotEnoughMembers');
 
     User.where('_id').in(membersIds).find((err, members) => {
         if (err) return next(err);
-        if (members.length !== membersIds.length) return next({status: 404, message: 'UserNotFound'});
+        if (members.length !== membersIds.length) return res.status(404).send('UserNotFound');
 
         new Group({name: name, members: membersIds}).save((err, group) => {
             if (err) return next(err);
@@ -57,7 +57,7 @@ router.post('/', (req, res, next) => {
  * @apiName GetGroup
  * @apiGroup Group
  *
- * @apiParam {Number} id Group id
+ * @apiParam {String} id Group id
  *
  * @apiParamExample
  * {
@@ -87,7 +87,7 @@ router.post('/', (req, res, next) => {
  *     ]
  * }
  *
- * @apiError (404)  GroupNotFound   Group with id {id} was not found.
+ * @apiError (404)  GroupNotFound   Group was not found
  */
 router.get('/:id', getGroup, (req, res) => {
     return res.send(req.group);
@@ -98,17 +98,28 @@ router.get('/:id', getGroup, (req, res) => {
  * @apiName GetGroups
  * @apiGroup Group
  *
- * @apiSuccess {Object[]}   groups               List of groups
- * @apiSuccess {String}     groups.id            The group's id
- * @apiSuccess {String}     groups.name          The group's name
+ * @apiSuccess {Object[]}   groups          List of groups
+ * @apiSuccess {String}     groups.id       Group's id
+ * @apiSuccess {String}     groups.name     Group's name
+ * @apiSuccess {String[]}   groups.recipes  Group's recipes' ids
+ * @apiSuccess {String[]}   groups.members  Group's participating users' ids
  *
  * @apiSuccessExample
  * {
- *     groups: [
- *       {id: "7zui621c4d7da43f508b9d5a", name: "Family"}
- *       {id: "7c89621c4d7da43f508b9d5a", name: "Friends"}
- *       {id: "7c89621c4d7da43f5080dh48", name: "Mighty beagles"}
- *     ]
+ *      groups: [
+ *          {
+ *              id: "7zui621c4d7da43f508b9d5a",
+ *              name: "The group of awesome",
+ *              recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
+ *              members: ["5ccc621c4d7da43f508b9d5a", "5ccc621c4d7da43f508b6f8g"]
+ *          },
+ *          {
+ *              id: "da43f508b9d5a5ccc621c4d7",
+ *              name: "The best group",
+ *              recipes: ["5ccc621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
+ *              members: ["7zui621c4d7da43f508b9d4d", "5ccc621c4d7da43f508b6f8g"]
+ *          }
+ *      ]
  * }
  */
 router.get('/', (req, res, next) => {
@@ -123,22 +134,23 @@ router.get('/', (req, res, next) => {
  * @apiName PatchGroup
  * @apiGroup Group
  *
- * @apiParam {String}   name        Group name
- * @apiParam {String[]} members       Participating users
- * @apiParam {String[]} recipes     The group's recipes
+ * @apiParam {String}       id          Group's id
+ * @apiParam {String}       name        Group name
+ * @apiParam {String[]}     members     Participating users' ids
+ * @apiParam {String[]}     recipes     The group's recipes' ids
  *
  * @apiParamExample
  * {
  *     name: "Group's name",
- *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"]],
- *     recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a"]
+ *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"],
+ *     recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a"]
  * }
  *
- * @apiSuccess (200)    Success     Group was updated.
+ * @apiSuccess (200)    Success     Group was updated
  *
- * @apiError (404)  GroupNotFound   Group with id {id} was not found.
- * @apiError (404)  UserNotFound    User with id {id} was not found.
- * @apiError (404)  RecipeNotFound  Recipe with id {id} was not found.
+ * @apiError (404)  GroupNotFound   Group was not found
+ * @apiError (404)  UserNotFound    User was not found
+ * @apiError (404)  RecipeNotFound  Recipe was not found
  */
 router.patch('/:id', getGroup, (req, res, next) => {
     let group = req.group;
@@ -195,7 +207,7 @@ router.patch('/:id', getGroup, (req, res, next) => {
  *
  * @apiSuccess (200)    Success     Group was deleted.
  *
- * @apiError (404)  GroupNotFound   Group with id {id} was not found.
+ * @apiError (404)  GroupNotFound   Group was not found.
  */
 router.delete('/:id', getGroup, (req, res, next) => {
     req.group.remove(function (err) {
@@ -206,10 +218,10 @@ router.delete('/:id', getGroup, (req, res, next) => {
 
 /* --- Middlewares --- */
 function getGroup(req, res, next) {
-    Group.findById(req.params.id).exec(function (err, group) {
+    Group.findById(req.params.id).exec((err, group) => {
         if (err) return next(err);
         // Checking if group exists
-        if (!group) return res.status(404).send({error: 'GroupNotFound'});
+        if (!group) return res.status(404).send('GroupNotFound');
         // Checking if current user is a member of that group
         if (!group.members.includes(req.userId)) return res.sendStatus(403);
         req.group = group;
