@@ -130,32 +130,42 @@ router.get('/:id', findMealById, (req, res, next) => {
 });
 
 /**
- * @api {get} /meals Index
- * @apiName GetMeals
- * @apiGroup Meal
- * @apiDescription Request a list of meals
+ * @api {get}   /meals Index
+ * @apiName     GetMeals
+ * @apiGroup    Meal
+ * @apiDescription Request a list of meals the authenticated user participates in
  *
- * @apiParam {String} id    Meal's id
+ * @apiParam    {String}    id              Meal's id
  *
- * @apiSuccess {String}     id                      Id
- * @apiSuccess {Date}       date                    Date
- * @apiSuccess {Object[]}   recipe                  Recipe
- * @apiSuccess {String}     recipe.id               Recipe'id
- * @apiSuccess {String}     recipe.name             Recipe's name
+ * @apiSuccess  {String}    _id             Id
+ * @apiSuccess  {String}    groupId         Group's id
+ * @apiSuccess  {String}    recipeId        Recipe's id
+ * @apiSuccess  {DateTime}  date            Date
+ * @apiSuccess  {String[]}  participants    Participating users
  *
  * @apiSuccessExample Response example
  * HTTP/1.1 200 OK
- * {
- *     id: "7ddd897c4d7da43f508b9d5a",
- *     date: "2018-11-17",
- *     recipe: {
- *       id: "7ddd897c4d7da43f50878io0",
- *       name: "Fried chicken"
- *     }
- * }
+ *  {
+ *      [
+ *          {
+ *              "_id": "5be05aa8286aae3f3491ec24",
+ *              "groupId": "5bbb621c4d7da43f508b9d5a",
+*               "recipeId": "7ddd897c4d7da43f508b9d5a",
+ *              "date": "2020-11-05T07:12:54.000Z",
+ *              "participants": ["5bdffb8653618745c0bba83f", "5bbb61284d7da43f508b9d59"]
+ *          },
+ *          {
+ *              "_id": "5be060bbfcd6c3145cb42fa0",
+ *              "groupId": "5be00126b1dd7244940b9c6d",
+ *              "recipeId": "5be01dddca9c3f4e801310c9",
+ *              "date": "2020-12-05T07:12:54.000Z",
+ *              "participants": ["5bdffb8653618745c0bba83f","5bdffb3d53618745c0bba83e"]
+ *          }
+ *     ]
+ *  }
  */
 router.get('/', (req, res, next) => {
-    Meal.find().sort('name').exec((err, meals) => {
+    Meal.find({participants: req.userId}).sort('name').exec((err, meals) => {
         if (err) return next(err);
         return res.status(200).send(meals);
     });

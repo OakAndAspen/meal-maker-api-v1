@@ -760,7 +760,7 @@ define({ "api": [
     "title": "Index",
     "name": "GetMeals",
     "group": "Meal",
-    "description": "<p>Request a list of meals</p>",
+    "description": "<p>Request a list of meals the authenticated user participates in</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -781,43 +781,43 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "_id",
             "description": "<p>Id</p>"
           },
           {
             "group": "Success 200",
-            "type": "Date",
+            "type": "String",
+            "optional": false,
+            "field": "groupId",
+            "description": "<p>Group's id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "recipeId",
+            "description": "<p>Recipe's id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "DateTime",
             "optional": false,
             "field": "date",
             "description": "<p>Date</p>"
           },
           {
             "group": "Success 200",
-            "type": "Object[]",
+            "type": "String[]",
             "optional": false,
-            "field": "recipe",
-            "description": "<p>Recipe</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipe.id",
-            "description": "<p>Recipe'id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipe.name",
-            "description": "<p>Recipe's name</p>"
+            "field": "participants",
+            "description": "<p>Participating users</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    id: \"7ddd897c4d7da43f508b9d5a\",\n    date: \"2018-11-17\",\n    recipe: {\n      id: \"7ddd897c4d7da43f50878io0\",\n      name: \"Fried chicken\"\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n {\n     [\n         {\n             \"_id\": \"5be05aa8286aae3f3491ec24\",\n             \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n              \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n             \"date\": \"2020-11-05T07:12:54.000Z\",\n             \"participants\": [\"5bdffb8653618745c0bba83f\", \"5bbb61284d7da43f508b9d59\"]\n         },\n         {\n             \"_id\": \"5be060bbfcd6c3145cb42fa0\",\n             \"groupId\": \"5be00126b1dd7244940b9c6d\",\n             \"recipeId\": \"5be01dddca9c3f4e801310c9\",\n             \"date\": \"2020-12-05T07:12:54.000Z\",\n             \"participants\": [\"5bdffb8653618745c0bba83f\",\"5bdffb3d53618745c0bba83e\"]\n         }\n    ]\n }",
           "type": "json"
         }
       ]
