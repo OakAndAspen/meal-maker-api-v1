@@ -919,7 +919,7 @@ define({ "api": [
     "title": "Create",
     "name": "PostMeal",
     "group": "Meal",
-    "description": "<p>Create a new meal</p> <ul> <li>All participants must be members of the group</li> </ul>",
+    "description": "<p>Create a new meal</p> <ul> <li>All participants must be members of the group</li> <li>The date must be in the future</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -956,7 +956,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    groupId: \"5bbb621c4d7da43f508b9d5a\",\n    recipeId: \"7ddd897c4d7da43f508b9d5a\",\n    date: \"1995-12-17\",\n    participants: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\", \"5bd7083ed584b00d1c768f2e\"]\n}",
+          "content": "{\n    \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n    \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n    \"date\": \"2020-11-05T08:12:54\",\n    \"participants\": [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"]\n}",
           "type": "json"
         }
       ]
@@ -964,6 +964,13 @@ define({ "api": [
     "success": {
       "fields": {
         "201": [
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
           {
             "group": "201",
             "type": "String",
@@ -997,7 +1004,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    groupId: \"5bbb621c4d7da43f508b9d5a\",\n    recipeId: \"7ddd897c4d7da43f508b9d5a\",\n    date: \"1995-12-17\",\n    participants: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\", \"5bd7083ed584b00d1c768f2e\"}]\n}",
+          "content": "HTTP/1.1 201 Created\n{\n    \"_id\": \"5be05aa8286aae3f3491ec24\",\n    \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n    \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n    \"date\": \"2020-11-05T07:12:54.000Z\",\n    \"participants\": [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"]\n}",
           "type": "json"
         }
       ]
@@ -1014,8 +1021,14 @@ define({ "api": [
           {
             "group": "400",
             "optional": false,
-            "field": "Missing",
-            "description": "<p>Data    Missing data</p>"
+            "field": "MissingData",
+            "description": "<p>Missing data</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "ParticipantsInvalid",
+            "description": "<p>Participants are not all members of this group</p>"
           }
         ],
         "404": [
@@ -1060,9 +1073,9 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
             "field": "Success",
             "description": "<p>Recipe was deleted</p>"
@@ -1072,6 +1085,14 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not the author</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
@@ -1570,15 +1591,86 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "204": [
+        "201": [
           {
-            "group": "204",
+            "group": "201",
+            "type": "String",
             "optional": false,
-            "field": "RecipeWasUpdated",
-            "description": "<p>Recipe was updated</p>"
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "authorId",
+            "description": "<p>Author user's id</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Description</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "imageUrl",
+            "description": "<p>Image URL</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "servings",
+            "description": "<p>Servings</p>"
+          },
+          {
+            "group": "201",
+            "type": "Object[]",
+            "optional": false,
+            "field": "ratings",
+            "description": "<p>Users ratings of this recipe</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "ratings.userId",
+            "description": "<p>Rating's user's is</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.health",
+            "description": "<p>Health rating</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.taste",
+            "description": "<p>Taste rating</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Response example",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be01b75570f034068fc97af\",\n    \"authorId\": \"5bdffb3d53618745c0bba83e\",\n    \"name\": \"Werewolf soup\",\n    \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n    \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n    \"servings\": 4,\n    \"ratings\": [],\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {

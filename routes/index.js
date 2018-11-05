@@ -120,7 +120,11 @@ router.post('/signup', (req, res, next) => {
             // Create the user
             bcrypt.hash(password, 10, (err, hashedPassword) => {
                 if (err) return next(err);
-                new User({email: email, userName: userName, password: hashedPassword}).save((err, user) => {
+                new User({
+                    email: email,
+                    userName: userName,
+                    password: hashedPassword
+                }).save((err, user) => {
                     if (err) return next(err);
                     return res.status(201).send(user);
                 });
