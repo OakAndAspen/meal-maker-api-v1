@@ -1098,7 +1098,7 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "string",
+            "type": "String",
             "allowedValues": [
               "\"group\"",
               "\"author\"",
@@ -1279,8 +1279,15 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "_id",
             "description": "<p>Id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "authorId",
+            "description": "<p>Author user's id</p>"
           },
           {
             "group": "Success 200",
@@ -1288,27 +1295,6 @@ define({ "api": [
             "optional": false,
             "field": "name",
             "description": "<p>Name</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "author",
-            "description": "<p>Author</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "author.id",
-            "description": "<p>The author's id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "author.userName",
-            "description": "<p>The author's name</p>"
           },
           {
             "group": "Success 200",
@@ -1321,15 +1307,50 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "imgUrl",
+            "field": "imageUrl",
             "description": "<p>Image URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "servings",
+            "description": "<p>Servings</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "ratings",
+            "description": "<p>Users ratings of this recipe</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "ratings.userId",
+            "description": "<p>Rating's user's is</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.health",
+            "description": "<p>Health rating</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.taste",
+            "description": "<p>Taste rating</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n  _id: \"5bbb621c4d7da43f508b9d5a\",\n  name: \"Fancy recipe for fancy people\",\n  author: {\n    id: \"7zui621c4d7da43f508b9d5a\",\n    userName: \"Dad\"\n  },\n  description: \"This is probably good, or so they say\",\n  imgUrl: \"https://cdn.myapp.net/img/jhsdfo4837f.jpg\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be01b75570f034068fc97af\",\n    \"authorId\": \"5bdffb3d53618745c0bba83e\",\n    \"name\": \"Werewolf soup\",\n    \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n    \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n    \"servings\": 4,\n    \"ratings\": []\n}",
           "type": "json"
         }
       ]
@@ -1341,7 +1362,7 @@ define({ "api": [
             "group": "404",
             "optional": false,
             "field": "RecipeNotFound",
-            "description": "<p>Recipe with id {id} was not found.</p>"
+            "description": "<p>Recipe was not found</p>"
           }
         ]
       }
@@ -1477,7 +1498,7 @@ define({ "api": [
     "title": "Update",
     "name": "PatchRecipe",
     "group": "Recipe",
-    "description": "<p>Update an existing recipe</p> <ul> <li>The authenticated user must be the author of the recipe</li> </ul>",
+    "description": "<p>Update an existing recipe</p> <ul> <li>Only the author can update properties other than the rating</li> <li>Users can only update their own rating</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1485,49 +1506,56 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
+            "field": "id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
             "field": "name",
             "description": "<p>Name</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
-            "optional": false,
+            "optional": true,
             "field": "description",
             "description": "<p>Description</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
-            "optional": false,
-            "field": "imgUrl",
+            "optional": true,
+            "field": "imageUrl",
             "description": "<p>Image URL</p>"
           },
           {
             "group": "Parameter",
-            "type": "Object[]",
-            "optional": false,
-            "field": "ratings",
-            "description": "<p>Ratings</p>"
+            "type": "Number",
+            "optional": true,
+            "field": "servings",
+            "description": "<p>Servings amount</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "rating",
+            "description": "<p>Rating from a user</p>"
           },
           {
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "ratings.userId",
-            "description": "<p>Rating's user's id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": "ratings.health",
+            "field": "rating.health",
             "description": "<p>Rating's health value</p>"
           },
           {
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "ratings.taste",
+            "field": "rating.taste",
             "description": "<p>Rating's taste value</p>"
           }
         ]
@@ -1535,31 +1563,59 @@ define({ "api": [
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    name: \"Recipe's name\",\n    description: \"Some awesome recipe\",\n    imgUrl: \"https://images.xyz/image.jpg\",\n    ratings: [\n      {userId: \"5bbb621c4d7da43f508b9d5a\", health: 5, taste: 2}\n      {userId: \"5bbb61284d7da43f508b9d59\", health: 1, taste: 5}\n    ]\n}",
+          "content": " {\n     \"rating\": {\n         \"health\": 5,\n         \"taste\": 2\n      }\n}",
           "type": "json"
         }
       ]
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
-            "field": "Success",
-            "description": "<p>Recipe was updated.</p>"
+            "field": "RecipeWasUpdated",
+            "description": "<p>Recipe was updated</p>"
           }
         ]
       }
     },
     "error": {
       "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "NameTooShort",
+            "description": "<p>Name is less than 3 characters long</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "ServingsInvalid",
+            "description": "<p>Servings amount is &lt; 1</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>Required data is missing</p>"
+          }
+        ],
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Non-author user is trying to edit the recipe</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
             "optional": false,
             "field": "RecipeNotFound",
-            "description": "<p>Recipe was not found.</p>"
+            "description": "<p>Recipe was not found</p>"
           }
         ]
       }

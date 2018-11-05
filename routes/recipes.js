@@ -289,52 +289,99 @@ router.get('/filtered/:filter', (req, res, next) => {
  * @apiName PatchRecipe
  * @apiGroup Recipe
  * @apiDescription Update an existing recipe
- * - The authenticated user must be the author of the recipe
+ * - Only the author can update properties other than the rating
+ * - Users can only update their own rating
  *
- * @apiParam {String}   name                Name
- * @apiParam {String}   description         Description
- * @apiParam {String}   imgUrl              Image URL
- * @apiParam {Object[]} ratings             Ratings
- * @apiParam {Number}   ratings.userId      Rating's user's id
- * @apiParam {Number}   ratings.health      Rating's health value
- * @apiParam {Number}   ratings.taste       Rating's taste value
+ * @apiParam {String}   id                  Id
+ * @apiParam {String}   [name]              Name
+ * @apiParam {String}   [description]       Description
+ * @apiParam {String}   [imageUrl]          Image URL
+ * @apiParam {Number}   [servings]          Servings amount
+ * @apiParam {Object}   [rating]            Rating from a user
+ * @apiParam {Number}   rating.health      Rating's health value
+ * @apiParam {Number}   rating.taste       Rating's taste value
  *
  * @apiParamExample Request example
- * {
- *     name: "Recipe's name",
- *     description: "Some awesome recipe",
- *     imgUrl: "https://images.xyz/image.jpg",
- *     ratings: [
- *       {userId: "5bbb621c4d7da43f508b9d5a", health: 5, taste: 2}
- *       {userId: "5bbb61284d7da43f508b9d59", health: 1, taste: 5}
- *     ]
+ *  {
+ *      "rating": {
+ *          "health": 5,
+ *          "taste": 2
+ *       }
  * }
  *
- * @apiSuccess (200)    Success     Recipe was updated.
+ * @apiSuccess (201) {String}   _id             Id
+ * @apiSuccess (201) {String}   authorId        Author user's id
+ * @apiSuccess (201) {String}   name            Name
+ * @apiSuccess (201) {String}   description     Description
+ * @apiSuccess (201) {String}   imageUrl        Image URL
+ * @apiSuccess (201) {Number}   servings        Servings
+ * @apiSuccess (201) {Object[]} ratings         Users ratings of this recipe
+ * @apiSuccess (201) {String}   ratings.userId  Rating's user's is
+ * @apiSuccess (201) {Number}   ratings.health  Health rating
+ * @apiSuccess (201) {Number}   ratings.taste   Taste rating
  *
- * @apiError (404)  RecipeNotFound   Recipe was not found.
+ * @apiSuccessExample Response example
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5be01b75570f034068fc97af",
+ *      "authorId": "5bdffb3d53618745c0bba83e",
+ *      "name": "Werewolf soup",
+ *      "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *      "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *      "servings": 4,
+ *      "ratings": [],
+ *  }
+ *
+ * @apiError    (404)   RecipeNotFound      Recipe was not found
+ * @apiError    (400)   NameTooShort        Name is less than 3 characters long
+ * @apiError    (403)   NotAllowed          Non-author user is trying to edit the recipe
+ * @apiError    (400)   ServingsInvalid     Servings amount is < 1
+ * @apiError    (400)   MissingData         Required data is missing
+ *
  */
 router.patch('/:id', findRecipeById, (req, res, next) => {
     let recipe = req.recipe;
-    let name = req.body.name;
-    let description = req.body.description;
-    let imageUrl = req.body.imageUrl;
-    let servings = req.body.servings;
+    let userId = req.userId;
+    let name = req.body.name || null;
+    let description = req.body.description || null;
+    let imageUrl = req.body.imageUrl || null;
+    let servings = req.body.servings || null;
+    let rating = req.body.rating || null;
 
-    if (name) {
+    // Checking if a non-author is trying to edit other informations
+    if((name || description || imageUrl || servings) && recipe.authorId !== userId) {
+        return res.status(403).send('NotAllowed');
+    }
+
+    // Updating the recipe's info
+    if(name) {
         if (name.length < 3) return res.status(400).send('NameTooShort');
         recipe.name = name;
     }
-    if (description) recipe.description = description;
-    if (imageUrl) recipe.imageUrl = imageUrl;
-    if (servings) {
-        if (servings < 1) return res.status(400).send('ServingsInvalid');
+    if(servings) {
+        if (isNaN(servings) || servings < 1) return res.status(400).send('ServingsInvalid');
         recipe.servings = servings;
     }
+    if(description) recipe.description = description;
+    if(imageUrl) recipe.imageUrl = imageUrl;
 
-    recipe.save((err, savedRecipe) => {
+    // Updating the ratings
+    if(rating) {
+        if(!rating.health || !rating.taste) return res.status(400).send('MissingData');
+        rating.userId = userId;
+        let ratingExists = false;
+        recipe.ratings = recipe.ratings.map(r => {
+            if(r.userId === userId) {
+                ratingExists= true;
+                return rating;
+            }
+        });
+        if(!ratingExists) recipe.ratings.push(rating);
+    }
+
+    recipe.save((err, updatedRecipe) => {
         if (err) return next(err);
-        return res.status(200).send(savedRecipe);
+        return res.status(200).send(updatedRecipe);
     });
 });
 
