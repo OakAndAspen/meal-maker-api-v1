@@ -166,7 +166,7 @@ router.get('/:id', findMealById, (req, res) => {
 router.get('/', (req, res, next) => {
     Meal.find({participants: req.userId}).sort('name').exec((err, meals) => {
         if (err) return next(err);
-        return res.status(200).send(meals);
+        return res.status(200).send({meals:meals});
     });
 });
 
