@@ -78,38 +78,40 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get} /recipes/:id Show
- * @apiName GetRecipe
- * @apiGroup Recipe
+ * @api {get}   /recipes/:id    Show
+ * @apiName     GetRecipe
+ * @apiGroup    Recipe
  * @apiDescription Request a recipe's info
  *
- * @apiParam {String} id    Id
+ * @apiParam    {String} id    Id
  *
- * @apiSuccess {String}     id                  Id
- * @apiSuccess {String}     name                Name
- * @apiSuccess {Object}     author              Author
- * @apiSuccess {String}     author.id           The author's id
- * @apiSuccess {String}     author.userName     The author's name
- * @apiSuccess {String}     description         Description
- * @apiSuccess {String}     imgUrl              Image URL
+ * @apiSuccess  {String}    _id             Id
+ * @apiSuccess  {String}    authorId        Author user's id
+ * @apiSuccess  {String}    name            Name
+ * @apiSuccess  {String}    description     Description
+ * @apiSuccess  {String}    imageUrl        Image URL
+ * @apiSuccess  {Number}    servings        Servings
+ * @apiSuccess  {Object[]}  ratings         Users ratings of this recipe
+ * @apiSuccess  {String}    ratings.userId  Rating's user's is
+ * @apiSuccess  {Number}    ratings.health  Health rating
+ * @apiSuccess  {Number}    ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *   _id: "5bbb621c4d7da43f508b9d5a",
- *   name: "Fancy recipe for fancy people",
- *   author: {
- *     id: "7zui621c4d7da43f508b9d5a",
- *     userName: "Dad"
- *   },
- *   description: "This is probably good, or so they say",
- *   imgUrl: "https://cdn.myapp.net/img/jhsdfo4837f.jpg"
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5be01b75570f034068fc97af",
+ *      "authorId": "5bdffb3d53618745c0bba83e",
+ *      "name": "Werewolf soup",
+ *      "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *      "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *      "servings": 4,
+ *      "ratings": []
+ *  }
  *
- * @apiError (404)  RecipeNotFound    Recipe with id {id} was not found.
+ * @apiError (404)  RecipeNotFound    Recipe was not found
  */
 router.get('/:id', findRecipeById, (req, res, next) => {
-    res.send(req.recipe);
+    res.status(200).send(req.recipe);
 });
 
 /**
