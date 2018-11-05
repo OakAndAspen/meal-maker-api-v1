@@ -5,28 +5,34 @@ const User = require('../models/user');
 const Recipe = require('../models/recipe');
 
 /**
- * @api {post} /groups Create a new group
+ * @api {post} /groups Create
  * @apiName PostGroup
  * @apiGroup Group
+ * @apiDescription Create a new group
+ * - The name must be at least 3 characters long
+ * - There must be at least 2 members
  *
  * @apiParam {String}   name    Group name
  * @apiParam {String[]} members Participating users' ids
  *
- * @apiParamExample
+ * @apiParamExample Request example
  * {
  *     name: "Stanton family"
  *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"]
  * }
  *
- * @apiSuccess (201) {String}   name        Group name
+ * @apiSuccess (201) {String}   _id         Id
+ * @apiSuccess (201) {String}   name        Name
  * @apiSuccess (201) {String[]} members     Participating users ids
  * @apiSuccess (201) {String[]} recipes     Recipes ids
  *
- * @apiSuccessExample
+ * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
- *     name: "Stanton family",
- *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"],
- *     recipes: []
+ *      _id: "1284d7d5bbb6a43f508b9d59",
+ *      name: "Stanton family",
+ *      members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"],
+ *      recipes: []
  * }
  *
  * @apiError (404)  UserNotFound        User was not found
@@ -53,13 +59,15 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get} /groups/:id Request a group's info
+ * @api {get} /groups/:id Show
  * @apiName GetGroup
  * @apiGroup Group
+ * @apiDescription Request a group's info
+ * - The authenticated user must be part of that group
  *
  * @apiParam {String} id Group id
  *
- * @apiParamExample
+ * @apiParamExample Request example
  * {
  *    id: "7cd5621c4d7da43f508b9d5a"
  * }
@@ -73,7 +81,8 @@ router.post('/', (req, res, next) => {
  * @apiSuccess {String}     members.id      User's id
  * @apiSuccess {String}     members.name    User's name
  *
- * @apiSuccessExample
+ * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
  *     id: "7zui621c4d7da43f508b9d5a",
  *     name: "The group of awesome",
@@ -94,9 +103,10 @@ router.get('/:id', getGroup, (req, res) => {
 });
 
 /**
- * @api {get} /groups Request a list of all groups the user is in
+ * @api {get} /groups Index
  * @apiName GetGroups
  * @apiGroup Group
+ * @apiDescription Request a list of all groups the user is in
  *
  * @apiSuccess {Object[]}   groups          List of groups
  * @apiSuccess {String}     groups.id       Group's id
@@ -104,7 +114,8 @@ router.get('/:id', getGroup, (req, res) => {
  * @apiSuccess {String[]}   groups.recipes  Group's recipes' ids
  * @apiSuccess {String[]}   groups.members  Group's participating users' ids
  *
- * @apiSuccessExample
+ * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
  *      groups: [
  *          {
@@ -130,14 +141,16 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {patch} /groups/:id  Update an existing group
+ * @api {patch} /groups/:id  Update
  * @apiName PatchGroup
  * @apiGroup Group
+ * @apiDescription Update an existing group
+ * - The authenticated user must be part of that group
  *
- * @apiParam {String}       id          Group's id
- * @apiParam {String}       name        Group name
- * @apiParam {String[]}     members     Participating users' ids
- * @apiParam {String[]}     recipes     The group's recipes' ids
+ * @apiParam {String}       id          Id
+ * @apiParam {String}       [name]      Name
+ * @apiParam {String[]}     [members]   Participating users' ids
+ * @apiParam {String[]}     [recipes]   Recipes' ids
  *
  * @apiParamExample
  * {
@@ -192,18 +205,17 @@ router.patch('/:id', getGroup, (req, res, next) => {
             if (err) return next(err);
             return res.status(201).send(group);
         });
-    })
+    });
 });
 
 /**
- * @api {delete} /groups:id  Delete a group
+ * @api {delete} /groups:id  Delete
  * @apiName DeleteGroup
  * @apiGroup Group
+ * @apiDescription Delete a group
+ * - The authenticated user must be part of that group
  *
- * @apiParamExample
- * {
- *     id: "5bbb621c4d7da43f508b9d5a"
- * }
+ * @apiParam {String} id    Id
  *
  * @apiSuccess (200)    Success     Group was deleted.
  *

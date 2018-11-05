@@ -4,16 +4,17 @@ const Recipe = require('../models/recipe');
 const Group = require('../models/group');
 
 /**
- * @api {post} /recipes Create a new recipe
+ * @api {post} /recipes Create
  * @apiName PostRecipe
  * @apiGroup Recipe
+ * @apiDescription Create a new recipe
  *
- * @apiParam {Number}   authorId    Author's id
+ * @apiParam {String}   authorId    Author's id
  * @apiParam {String}   name        Name
  * @apiParam {String}   description Description
  * @apiParam {String}   imgUrl      Image URL
  *
- * @apiParamExample
+ * @apiParamExample Request example
  * {
  *     authorId: "5bbb621c4d7da43f508b9d5a",
  *     name: "Fancy recipe",
@@ -26,8 +27,10 @@ const Group = require('../models/group');
  * @apiSuccess (201) {String}   description Description
  * @apiSuccess (201) {String}   imgUrl      Image URL
  *
- * @apiSuccessExample
+ * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
+ *
  *     authorId: "5bbb621c4d7da43f508b9d5a",
  *     name: "Fancy recipe",
  *     description: "This will be good... probably",
@@ -64,14 +67,12 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get} /recipes/:id Request a recipe's info
+ * @api {get} /recipes/:id Show
  * @apiName GetRecipe
  * @apiGroup Recipe
+ * @apiDescription Request a recipe's info
  *
- * @apiParamSuccess
- * {
- *     id: "5bbb621c4d7da43f508b9d5a"
- * }
+ * @apiParam {String} id    Id
  *
  * @apiSuccess {String}     id                  Id
  * @apiSuccess {String}     name                Name
@@ -81,9 +82,10 @@ router.post('/', (req, res, next) => {
  * @apiSuccess {String}     description         Description
  * @apiSuccess {String}     imgUrl              Image URL
  *
- * @apiSuccessExample
+ * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
- *   id: "5bbb621c4d7da43f508b9d5a",
+ *   _id: "5bbb621c4d7da43f508b9d5a",
  *   name: "Fancy recipe for fancy people",
  *   author: {
  *     id: "7zui621c4d7da43f508b9d5a",
@@ -100,32 +102,41 @@ router.get('/:id', findRecipeById, (req, res, next) => {
 });
 
 /**
- * @api {get} /recipes Request a list of recipes, optionally filtered by
+ * @api {get} /recipes Index
+ * @apiName GetRecipes
+ * @apiGroup Recipe
+ * @apiDescription Request a list of recipes, paginated and optionally filtered by
  *  - group (only the recipes that have been added to the given group)
  *  - author (only the recipes that have been created by the given user)
  *  - current user (only the recipes that the current user has rated)
- * @apiName GetRecipes
- * @apiGroup Recipe
  *
  * @apiParam {String}   filter      The kind of filter to use ("group", "author" or "user")
+ * @apiParam {Number}   page        The current page, showing max. 5 results
  * @apiParam {String}   authorId    Author's id
  * @apiParam {String}   groupId     Group's id
  *
- * @apiSuccess {Object[]}   recipes                 List of recipes
- * @apiSuccess {Number}     recipes.id              The recipe's id
- * @apiSuccess {String}     recipes.name            The recipe's name
- * @apiSuccess {Object}     recipes.author          The recipe's author
- * @apiSuccess {String}     recipes.author.id       The author's id
- * @apiSuccess {String}     recipes.author.userName The author's username
+ * @apiParamExample Request example
+ * {
+ *      filter; "group",
+ *      page: 2,
+ *      groupId: "5bbb621c4d7da43f508b9d5a",
+ * }
  *
- * @apiSuccessExample
+ * @apiSuccess {Object[]}   recipes                 List of recipes
+ * @apiSuccess {String}     recipes._id             Recipe's id
+ * @apiSuccess {String}     recipes.name            Recipe's name
+ * @apiSuccess {Object}     recipes.author          Recipe's author
+ * @apiSuccess {String}     recipes.author._id      Author's id
+ * @apiSuccess {String}     recipes.author.userName Author's username
+ *
+ * @apiSuccessExample Response example
  * {
  *     recipes: [
  *       {
- *          id: "7zui621c4d7da43f508b9d5a",
+ *          _id: "7zui621c4d7da43f508b9d5a",
  *          name: "Recipe 1",
  *          author: {
- *            id: "5bbb621c4d7da43f508b9d5a",
+ *            _id: "5bbb621c4d7da43f508b9d5a",
  *            userName: "TheGreatJoe"
  *          }
  *        }
@@ -169,14 +180,11 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {patch} /recipes/:id  Update an existing recipe
+ * @api {patch} /recipes/:id Update
  * @apiName PatchRecipe
  * @apiGroup Recipe
- *
- * @apiParamExample
- * {
- *     id: "7zui621c4d7da43f508b9d5a
- * }
+ * @apiDescription Update an existing recipe
+ * - The authenticated user must be the author of the recipe
  *
  * @apiParam {String}   name                Name
  * @apiParam {String}   description         Description
@@ -186,7 +194,7 @@ router.get('/', (req, res, next) => {
  * @apiParam {Number}   ratings.health      Rating's health value
  * @apiParam {Number}   ratings.taste       Rating's taste value
  *
- * @apiParamExample
+ * @apiParamExample Request example
  * {
  *     name: "Recipe's name",
  *     description: "Some awesome recipe",
@@ -199,7 +207,7 @@ router.get('/', (req, res, next) => {
  *
  * @apiSuccess (200)    Success     Recipe was updated.
  *
- * @apiError (404)  RecipeNotFound   Recipe with id {id} was not found.
+ * @apiError (404)  RecipeNotFound   Recipe was not found.
  */
 router.patch('/:id', findRecipeById, (req, res, next) => {
     let recipe = req.recipe;
@@ -226,18 +234,17 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
 });
 
 /**
- * @api {delete} /recipes/:id  Delete a recipe
+ * @api {delete} /recipes/:id  Delete
  * @apiName DeleteRecipe
  * @apiGroup Recipe
+ * @apiDescription Delete a recipe
+ * - The authenticated user must be the author of the recipe
  *
- * @apiParamExample
- * {
- *     id: "7zui621c4d7da43f508b9d5a"
- * }
+ * @apiParam {String} id    Recipe's id
  *
- * @apiSuccess (200)    Success     Recipe was deleted.
+ * @apiSuccess (200)    Success     Recipe was deleted
  *
- * @apiError (404)  RecipeNotFound   Recipe with id {id} was not found.
+ * @apiError (404)  RecipeNotFound   Recipe was not found
  */
 router.delete('/:id', findRecipeById, (req, res, next) => {
     if(req.recipe.authorId !== req.userId) res.sendStatus(403);
