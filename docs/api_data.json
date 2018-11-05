@@ -1554,17 +1554,28 @@
     "group": "User",
     "description": "<p>Request a user's info</p>",
     "parameter": {
-      "examples": [
-        {
-          "title": "Request example",
-          "content": "{\n    id: \"5bbb621c4d7da43f508b9d5a\"\n}",
-          "type": "json"
-        }
-      ]
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id</p>"
+          }
+        ]
+      }
     },
     "success": {
       "fields": {
         "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
           {
             "group": "Success 200",
             "type": "String",
@@ -1578,13 +1589,20 @@
             "optional": false,
             "field": "email",
             "description": "<p>Email address</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "registration",
+            "description": "<p>Registration date</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    userName: \"TheAwesomeUser\",\n    email: \"awesome@stanton.xyz\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5bdfe46d7c9e2801085676bf\",\n    \"email\": \"ciri@ofrivia.com\",\n    \"userName\": \"SilverHair\",\n    \"registration\": \"2018-11-05T06:34:21.286Z\",\n}",
           "type": "json"
         }
       ]
@@ -1596,7 +1614,7 @@
             "group": "404",
             "optional": false,
             "field": "UserNotFound",
-            "description": "<p>User with id {id} was not found.</p>"
+            "description": "<p>User was not found.</p>"
           }
         ]
       }

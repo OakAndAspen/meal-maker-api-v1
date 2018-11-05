@@ -5,30 +5,31 @@ const bcrypt = require('bcrypt');
 
 /**
  * TODO: aggregate of rated recipes
- * @api {get} /users/:id Show
- * @apiName GetUser
- * @apiGroup User
- * @apiDescription Request a user's info
+ * @api         {get}   /users/:id  Show
+ * @apiName     GetUser
+ * @apiGroup    User
+ * @apiDescription      Request a user's info
  *
- * @apiParamExample Request example
- * {
- *     id: "5bbb621c4d7da43f508b9d5a"
- * }
+ * @apiParam    {String}    id          Id
  *
- * @apiSuccess {String} userName    Username
- * @apiSuccess {String} email       Email address
+ * @apiSuccess  {String}    _id             Id
+ * @apiSuccess  {String}    userName        Username
+ * @apiSuccess  {String}    email           Email address
+ * @apiSuccess  {String}    registration    Registration date
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *     userName: "TheAwesomeUser",
- *     email: "awesome@stanton.xyz"
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5bdfe46d7c9e2801085676bf",
+ *      "email": "ciri@ofrivia.com",
+ *      "userName": "SilverHair",
+ *      "registration": "2018-11-05T06:34:21.286Z",
+ *  }
  *
- * @apiError (404)  UserNotFound    User with id {id} was not found.
+ * @apiError (404)  UserNotFound    User was not found.
  */
 router.get('/:id', findUserById, (req, res, next) => {
-    res.send(req.user);
+    return res.status(200).send(req.user);
 });
 
 /**
