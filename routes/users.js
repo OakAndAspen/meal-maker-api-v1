@@ -71,27 +71,32 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * TODO: test
- * @api {patch} /users/:id Update
- * @apiName PatchUser
- * @apiGroup User
- * @apiDescription Update an existing user
+ * @api         {patch}     /users/:id  Update
+ * @apiName     PatchUser
+ * @apiGroup    User
+ * @apiDescription          Update an existing user
  * - The authenticated user can only update itself
+ * - The password must be at least 6 characters long and contain at least a number and a letter
  *
  * @apiParam {String}   id          Id
  * @apiParam {String}   password    New password
  *
  * @apiParamExample Request example
  * {
- *     password: "Yennefer4Ever"
+ *     "password": "Yennefer4Ever"
  * }
  *
- * @apiSuccess  (200) UserWasUpdated    User was updated
+ * @apiSuccess  (204) UserWasUpdated    User was updated
+ *
  * @apiError    (404) UserNotFound      User was not found
+ * @apiError    (403) NotAllowed        Authenticated user is not allowed to do this
+ * @apiError    (400) PasswordInvalid   Password is invalid
  */
 router.patch('/:id', findUserById, (req, res, next) => {
     let user = req.user;
-    if(user._id !== req.userId) return req.sendStatus(403);
+    console.log(user._id);
+    console.log(req.userId);
+    if(user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
     let password = req.body.password;
 
     // Check for invalid password
@@ -105,7 +110,7 @@ router.patch('/:id', findUserById, (req, res, next) => {
         user.password = hashedPassword;
         user.save((err, updatedUser) => {
             if (err) return next(err);
-            return res.status(200).send('UserWasUpdated');
+            return res.status(204).send('UserWasUpdated');
         });
     });
 });
@@ -123,10 +128,10 @@ router.patch('/:id', findUserById, (req, res, next) => {
  */
 router.delete('/:id', findUserById, (req, res, next) => {
     let user = req.user;
-    if(user._id !== req.userId) return req.sendStatus(403);
+    if(user._id !== req.userId) return req.status(403).send('NotAllowed');
     user.remove(function (err) {
         if (err) return next(err);
-        res.sendStatus(204);
+        return res.status(204).send('UserWasDeleted');
     });
 });
 

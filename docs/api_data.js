@@ -1688,7 +1688,7 @@ define({ "api": [
     "title": "Update",
     "name": "PatchUser",
     "group": "User",
-    "description": "<p>Update an existing user</p> <ul> <li>The authenticated user can only update itself</li> </ul>",
+    "description": "<p>Update an existing user</p> <ul> <li>The authenticated user can only update itself</li> <li>The password must be at least 6 characters long and contain at least a number and a letter</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1711,16 +1711,16 @@ define({ "api": [
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    password: \"Yennefer4Ever\"\n}",
+          "content": "{\n    \"password\": \"Yennefer4Ever\"\n}",
           "type": "json"
         }
       ]
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
             "field": "UserWasUpdated",
             "description": "<p>User was updated</p>"
@@ -1730,6 +1730,22 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "PasswordInvalid",
+            "description": "<p>Password is invalid</p>"
+          }
+        ],
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not allowed to do this</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
