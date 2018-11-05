@@ -116,19 +116,21 @@ router.patch('/:id', findUserById, (req, res, next) => {
 });
 
 /**
- * @api {delete} /users/:id Delete
- * @apiName DeleteUser
- * @apiGroup User
- * @apiDescription Delete a user
+ * @api         {delete}    /users/:id  Delete
+ * @apiName     DeleteUser
+ * @apiGroup    User
+ * @apiDescription          Delete a user
  * - The authenticated user can only delete itself
  *
  * @apiParam {String} id    Id
  *
- * @apiError    (404) UserNotFound      User was not found
+ * @apiSuccess  (204)   UserWasDeleted  User was deleted
+ *
+ * @apiError    (404)   UserNotFound    User was not found
  */
 router.delete('/:id', findUserById, (req, res, next) => {
     let user = req.user;
-    if(user._id !== req.userId) return req.status(403).send('NotAllowed');
+    if(user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
     user.remove(function (err) {
         if (err) return next(err);
         return res.status(204).send('UserWasDeleted');

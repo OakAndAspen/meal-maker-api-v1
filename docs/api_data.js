@@ -1530,6 +1530,18 @@ define({ "api": [
         ]
       }
     },
+    "success": {
+      "fields": {
+        "204": [
+          {
+            "group": "204",
+            "optional": false,
+            "field": "UserWasDeleted",
+            "description": "<p>User was deleted</p>"
+          }
+        ]
+      }
+    },
     "error": {
       "fields": {
         "404": [
