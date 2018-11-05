@@ -5,12 +5,12 @@ const Recipe = require('../models/recipe');
 const bcrypt = require('bcrypt');
 
 /**
- * @api         {get}   /users/:id  Show
- * @apiName     GetUser
- * @apiGroup    User
- * @apiDescription      Request a user's info
+ * @api {get}       /users/:id  Show
+ * @apiName         GetUser
+ * @apiGroup        User
+ * @apiDescription  Request a user's info
  *
- * @apiParam    {String}    id          Id
+ * @apiParam    {String}    id              Id
  *
  * @apiSuccess  {String}    _id             Id
  * @apiSuccess  {String}    userName        Username
@@ -29,19 +29,20 @@ const bcrypt = require('bcrypt');
  * @apiError (404)  UserNotFound    User was not found.
  */
 router.get('/:id', findUserById, (req, res, next) => {
-    let userId = req.user._id;
-    Recipe.aggregate([{$match: {'ratings.userId': userId}}], (err, results) => {
-        if(err) return next(err);
-        return res.send(results);
-        return res.status(200).send(req.user);
+    let user = req.user;
+    Recipe.find().where('ratings.userId', user._id).countDocuments((err, count) => {
+        if (err) return next(err);
+        user = user.toObject();
+        user.ratedRecipes = count;
+        return res.status(200).send(user);
     });
 });
 
 /**
- * @api {get}   /users Index
- * @apiName     GetUsers
- * @apiGroup    User
- * @apiDescription Request a list of users
+ * @api {get}       /users      Index
+ * @apiName         GetUsers
+ * @apiGroup        User
+ * @apiDescription  Request a list of users
  *
  * @apiSuccess {Object[]}   users               List of users
  * @apiSuccess {Number}     users.id            Id
@@ -71,15 +72,15 @@ router.get('/:id', findUserById, (req, res, next) => {
 router.get('/', (req, res, next) => {
     User.find().sort('userName').exec(function (err, users) {
         if (err) return next(err);
-        return res.status(200).send({"users":users});
+        return res.status(200).send({"users": users});
     });
 });
 
 /**
- * @api         {patch}     /users/:id  Update
- * @apiName     PatchUser
- * @apiGroup    User
- * @apiDescription          Update an existing user
+ * @api {patch}     /users/:id  Update
+ * @apiName         PatchUser
+ * @apiGroup        User
+ * @apiDescription  Update an existing user
  * - The authenticated user can only update itself
  * - The password must be at least 6 characters long and contain at least a number and a letter
  *
@@ -101,7 +102,7 @@ router.patch('/:id', findUserById, (req, res, next) => {
     let user = req.user;
     console.log(user._id);
     console.log(req.userId);
-    if(user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
+    if (user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
     let password = req.body.password;
 
     // Check for invalid password
@@ -121,10 +122,10 @@ router.patch('/:id', findUserById, (req, res, next) => {
 });
 
 /**
- * @api         {delete}    /users/:id  Delete
- * @apiName     DeleteUser
- * @apiGroup    User
- * @apiDescription          Delete a user
+ * @api {delete}    /users/:id  Delete
+ * @apiName         DeleteUser
+ * @apiGroup        User
+ * @apiDescription  Delete a user
  * - The authenticated user can only delete itself
  *
  * @apiParam {String} id    Id
@@ -135,7 +136,7 @@ router.patch('/:id', findUserById, (req, res, next) => {
  */
 router.delete('/:id', findUserById, (req, res, next) => {
     let user = req.user;
-    if(user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
+    if (user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
     user.remove(function (err) {
         if (err) return next(err);
         return res.status(204).send('UserWasDeleted');
