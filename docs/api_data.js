@@ -221,24 +221,32 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
-            "field": "Success",
-            "description": "<p>Group was deleted.</p>"
+            "field": "GroupWasDeleted",
+            "description": "<p>Group was deleted</p>"
           }
         ]
       }
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user if not part of that group</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
             "optional": false,
             "field": "GroupNotFound",
-            "description": "<p>Group was not found.</p>"
+            "description": "<p>Group was not found</p>"
           }
         ]
       }
@@ -380,36 +388,36 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "groups.id",
-            "description": "<p>Group's id</p>"
+            "field": "groups._id",
+            "description": "<p>Id</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "groups.name",
-            "description": "<p>Group's name</p>"
+            "description": "<p>Name</p>"
           },
           {
             "group": "Success 200",
             "type": "String[]",
             "optional": false,
             "field": "groups.recipes",
-            "description": "<p>Group's recipes' ids</p>"
+            "description": "<p>Recipes' ids</p>"
           },
           {
             "group": "Success 200",
             "type": "String[]",
             "optional": false,
             "field": "groups.members",
-            "description": "<p>Group's participating users' ids</p>"
+            "description": "<p>Participating users' ids</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n     \"groups\": [\n         {\n             \"id\": \"7zui621c4d7da43f508b9d5a\",\n             \"name\": \"The group of awesome\",\n             \"recipes\": [\"7zui621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             \"members\": [\"5ccc621c4d7da43f508b9d5a\", \"5ccc621c4d7da43f508b6f8g\"]\n         },\n         {\n             \"id: \"da43f508b9d5a5ccc621c4d7\",\n             \"name\": \"The best group\",\n             \"recipes\": [\"5ccc621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             \"members\": [\"7zui621c4d7da43f508b9d4d\", \"5ccc621c4d7da43f508b6f8g\"]\n         }\n     ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"groups\": [\n        {\n            \"members\": [\"5bdfe46d7c9e2801085676bf\", \"5bdffb3d53618745c0bba83e\"],\n             \"recipes\": [],\n            \"_id\": \"5be004248563073e743b8688\",\n            \"name\": \"KaerMorhenKitchen\"\n        },\n        {\n            \"members\": [\"5bdffb8653618745c0bba83f\", \"5bdffb3d53618745c0bba83e\"],\n            \"recipes\": [],\n            \"_id\": \"5be00126b1dd7244940b9c6d\",\n            \"name\": \"RedBaronCastle\"\n        }\n    ]\n}",
           "type": "json"
         }
       ]

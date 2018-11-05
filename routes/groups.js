@@ -38,7 +38,7 @@ const Recipe = require('../models/recipe');
  *      "members": [
  *          "5bdffb8653618745c0bba83f",
  *          "5bdffb3d53618745c0bba83e"
-*       ],
+ *       ],
  *      "recipes": []
  *  }
  *
@@ -51,7 +51,7 @@ router.post('/', (req, res, next) => {
     let name = req.body.name || null;
     let members = req.body.members || null;
 
-    if(!name || !members) return res.status(400).send('MissingData');
+    if (!name || !members) return res.status(400).send('MissingData');
     if (name.length < 3) return res.status(400).send('NameTooShort');
 
     // Check members
@@ -115,40 +115,40 @@ router.get('/:id', getGroup, (req, res) => {
 });
 
 /**
- * @api {get} /groups Index
- * @apiName GetGroups
- * @apiGroup Group
+ * @api {get}   /groups Index
+ * @apiName     GetGroups
+ * @apiGroup    Group
  * @apiDescription Request a list of all groups the user is in
  *
  * @apiSuccess {Object[]}   groups          List of groups
- * @apiSuccess {String}     groups.id       Group's id
- * @apiSuccess {String}     groups.name     Group's name
- * @apiSuccess {String[]}   groups.recipes  Group's recipes' ids
- * @apiSuccess {String[]}   groups.members  Group's participating users' ids
+ * @apiSuccess {String}     groups._id      Id
+ * @apiSuccess {String}     groups.name     Name
+ * @apiSuccess {String[]}   groups.recipes  Recipes' ids
+ * @apiSuccess {String[]}   groups.members  Participating users' ids
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
+ *  HTTP/1.1 200 OK
+ *  {
  *      "groups": [
  *          {
- *              "id": "7zui621c4d7da43f508b9d5a",
- *              "name": "The group of awesome",
- *              "recipes": ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
- *              "members": ["5ccc621c4d7da43f508b9d5a", "5ccc621c4d7da43f508b6f8g"]
+ *              "members": ["5bdfe46d7c9e2801085676bf", "5bdffb3d53618745c0bba83e"],
+*               "recipes": [],
+ *              "_id": "5be004248563073e743b8688",
+ *              "name": "KaerMorhenKitchen"
  *          },
  *          {
- *              "id: "da43f508b9d5a5ccc621c4d7",
- *              "name": "The best group",
- *              "recipes": ["5ccc621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
- *              "members": ["7zui621c4d7da43f508b9d4d", "5ccc621c4d7da43f508b6f8g"]
+ *              "members": ["5bdffb8653618745c0bba83f", "5bdffb3d53618745c0bba83e"],
+ *              "recipes": [],
+ *              "_id": "5be00126b1dd7244940b9c6d",
+ *              "name": "RedBaronCastle"
  *          }
  *      ]
- * }
+ *  }
  */
 router.get('/', (req, res, next) => {
     Group.find({members: req.userId}).sort('name').exec((err, groups) => {
         if (err) return next(err);
-        res.send(groups);
+        res.status(200).send({'groups': groups});
     });
 });
 
@@ -221,22 +221,24 @@ router.patch('/:id', getGroup, (req, res, next) => {
 });
 
 /**
- * @api {delete} /groups:id  Delete
- * @apiName DeleteGroup
- * @apiGroup Group
- * @apiDescription Delete a group
+ * @api {delete}    /groups:id  Delete
+ * @apiName         DeleteGroup
+ * @apiGroup        Group
+ * @apiDescription  Delete a group
  * - The authenticated user must be part of that group
  *
  * @apiParam {String} id    Id
  *
- * @apiSuccess (200)    Success     Group was deleted.
+ * @apiSuccess  (204)   GroupWasDeleted Group was deleted
  *
- * @apiError (404)  GroupNotFound   Group was not found.
+ * @apiError    (404)   GroupNotFound   Group was not found
+ * @apiError    (403)   NotAllowed      Authenticated user if not part of that group
  */
 router.delete('/:id', getGroup, (req, res, next) => {
+    if (!req.group.members.includes(req.userId)) return res.status(403).send('NotAllowed');
     req.group.remove(function (err) {
         if (err) return next(err);
-        return res.sendStatus(204);
+        return res.status(204).send('GroupWasDeleted');
     });
 });
 
