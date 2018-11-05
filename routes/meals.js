@@ -205,10 +205,10 @@ router.patch('/:id', findMealById, (req, res, next) => {
 });
 
 /**
- * @api {delete} /meals/:id  Delete
- * @apiName DeleteMeal
- * @apiGroup Meal
- * @apiDescription Delete a meal
+ * @api {delete}    /meals/:id      Delete
+ * @apiName         DeleteMeal
+ * @apiGroup        Meal
+ * @apiDescription  Delete a meal
  *
  * @apiParam {String}   id              Meal's id
  *
