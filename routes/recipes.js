@@ -37,7 +37,7 @@ const Group = require('../models/group');
  * @apiSuccess (201) {Number}   ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- *  HTTP/1.1 201 OK
+ *  HTTP/1.1 201 Created
  *  {
  *      "_id": "5be01b75570f034068fc97af",
  *      "authorId": "5bdffb3d53618745c0bba83e",
@@ -59,7 +59,7 @@ router.post('/', (req, res, next) => {
     let imageUrl = req.body.imageUrl || null;
     let servings = req.body.servings || null;
 
-    if(!name || !description || !imageUrl || !servings) return res.status(400).send('MissingData');
+    if (!name || !description || !imageUrl || !servings) return res.status(400).send('MissingData');
     if (name.length < 3) return res.status(400).send('NameTooShort');
     if (isNaN(servings) || servings < 1) return res.status(400).send('ServingsInvalid');
 
@@ -113,9 +113,67 @@ router.get('/:id', findRecipeById, (req, res, next) => {
 });
 
 /**
- * @api {get} /recipes Index
- * @apiName GetRecipes
- * @apiGroup Recipe
+ * @api {get}   /recipes Index
+ * @apiName     GetRecipes
+ * @apiGroup    Recipe
+ * @apiDescription Request a list of recipes, paginated, with a max. of 5 recipes per page
+ *
+ * @apiParam {Number}   page        The current page, showing max. 5 results
+ *
+ * @apiParamExample Request example
+ * {
+ *      page: 2
+ * }
+ *
+ * @apiSuccess {Object[]}   recipes                 List of recipes
+ * @apiSuccess {String}     recipes._id             Id
+ * @apiSuccess {String}     recipes.authorId        Author user's id
+ * @apiSuccess {String}     recipes.name            Name
+ * @apiSuccess {String}     recipes.description     Description
+ * @apiSuccess {String}     recipes.imageUrl        Image URL
+ * @apiSuccess {Number}     recipes.servings        Servings
+ * @apiSuccess {Object[]}   recipes.ratings         Users ratings of this recipe
+ * @apiSuccess {String}     recipes.ratings.userId  Rating's user's is
+ * @apiSuccess {Number}     recipes.ratings.health  Health rating
+ * @apiSuccess {Number}     recipes.ratings.taste   Taste rating
+ *
+ * @apiSuccessExample Response example
+ *  HTTP/1.1 201 Created
+ *  {
+ *      "recipes": [
+ *          {
+ *              "_id": "5be01b75570f034068fc97af",
+ *              "authorId": "5bdffb3d53618745c0bba83e",
+ *              "name": "Werewolf soup",
+ *              "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *              "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *              "servings": 4,
+ *              "ratings": []
+ *          },
+ *          {
+ *              "_id": "5be01dddca9c3f4e801310c9",
+ *              "authorId": "5bdffb3d53618745c0bba83e",
+ *              "name": "Griffin soup",
+ *              "description": "A witcher delicacy! Juste take the eyes and claws of your freshly killed griffin and boil them in orange juice.",
+ *              "imageUrl": "//cdn.myapp.net/img/jhso4837f.jpg",
+ *              "servings": 10,
+ *              "ratings": []
+ *          }
+ *      ]
+ *  }
+ *
+ */
+router.get('/', (req, res, next) => {
+    Recipe.find({}).exec((err, recipes) => {
+        if (err) return next(err);
+        return res.status(200).send({recipes:recipes});
+    });
+});
+
+/**
+ * @api {get}   /recipes/filtered/:filter    Filter
+ * @apiName     GetRecipes
+ * @apiGroup    Recipe
  * @apiDescription Request a list of recipes, paginated and optionally filtered by
  *  - group (only the recipes that have been added to the given group)
  *  - author (only the recipes that have been created by the given user)
@@ -134,28 +192,45 @@ router.get('/:id', findRecipeById, (req, res, next) => {
  * }
  *
  * @apiSuccess {Object[]}   recipes                 List of recipes
- * @apiSuccess {String}     recipes._id             Recipe's id
- * @apiSuccess {String}     recipes.name            Recipe's name
- * @apiSuccess {Object}     recipes.author          Recipe's author
- * @apiSuccess {String}     recipes.author._id      Author's id
- * @apiSuccess {String}     recipes.author.userName Author's username
+ * @apiSuccess {String}     recipes._id             Id
+ * @apiSuccess {String}     recipes.authorId        Author user's id
+ * @apiSuccess {String}     recipes.name            Name
+ * @apiSuccess {String}     recipes.description     Description
+ * @apiSuccess {String}     recipes.imageUrl        Image URL
+ * @apiSuccess {Number}     recipes.servings        Servings
+ * @apiSuccess {Object[]}   recipes.ratings         Users ratings of this recipe
+ * @apiSuccess {String}     recipes.ratings.userId  Rating's user's is
+ * @apiSuccess {Number}     recipes.ratings.health  Health rating
+ * @apiSuccess {Number}     recipes.ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- * {
- *     recipes: [
- *       {
- *          _id: "7zui621c4d7da43f508b9d5a",
- *          name: "Recipe 1",
- *          author: {
- *            _id: "5bbb621c4d7da43f508b9d5a",
- *            userName: "TheGreatJoe"
+ *  HTTP/1.1 201 Created
+ *  {
+ *      "recipes": [
+ *          {
+ *              "_id": "5be01b75570f034068fc97af",
+ *              "authorId": "5bdffb3d53618745c0bba83e",
+ *              "name": "Werewolf soup",
+ *              "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *              "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *              "servings": 4,
+ *              "ratings": []
+ *          },
+ *          {
+ *              "_id": "5be01dddca9c3f4e801310c9",
+ *              "authorId": "5bdffb3d53618745c0bba83e",
+ *              "name": "Griffin soup",
+ *              "description": "A witcher delicacy! Juste take the eyes and claws of your freshly killed griffin and boil them in orange juice.",
+ *              "imageUrl": "//cdn.myapp.net/img/jhso4837f.jpg",
+ *              "servings": 10,
+ *              "ratings": []
  *          }
- *        }
- *     ]
- * }
+ *      ]
+ *  }
+ *
  */
-router.get('/', (req, res, next) => {
-    let filter = req.body.filter;
+router.get('/filtered/:filter', (req, res, next) => {
+    let filter = req.params.id;
 
     // Get recipes filtered by group
     if (filter === 'group') {
@@ -258,7 +333,7 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
  * @apiError (404)  RecipeNotFound   Recipe was not found
  */
 router.delete('/:id', findRecipeById, (req, res, next) => {
-    if(req.recipe.authorId !== req.userId) res.sendStatus(403);
+    if (req.recipe.authorId !== req.userId) res.sendStatus(403);
     req.recipe.remove(function (err) {
         if (err) return next(err);
         res.sendStatus(204);
