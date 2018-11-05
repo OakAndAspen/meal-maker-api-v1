@@ -1092,23 +1092,22 @@
     "title": "Filter",
     "name": "FilterRecipes",
     "group": "Recipe",
-    "description": "<p>Request a list of recipes, paginated and optionally filtered by</p> <ul> <li>group (only the recipes that have been added to the given group)</li> <li>author (only the recipes that have been created by the given user)</li> <li>current user (only the recipes that the current user has rated)</li> </ul>",
+    "description": "<p>Request a list of recipes, filtered by</p> <ul> <li>group <ul> <li>Shows the recipes that have been added to the given group</li> <li>Requires <code>groupId</code></li> </ul> </li> <li>author <ul> <li>Shows the recipes by the given author</li> <li>Requires <code>authorId</code></li> </ul> </li> <li>current user <ul> <li>Shows the recipes that the current user has rated</li> </ul> </li> <li>matching <ul> <li>Shows the max. 3 recipes that match best the participating users ratings</li> <li>Requires <code>groupId</code> and <code>participants</code></li> </ul> </li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "string",
+            "allowedValues": [
+              "\"group\"",
+              "\"author\"",
+              "\"user\"",
+              "\"match\""
+            ],
             "optional": false,
             "field": "filter",
-            "description": "<p>The kind of filter to use (&quot;group&quot;, &quot;author&quot; or &quot;user&quot;)</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": false,
-            "field": "page",
-            "description": "<p>The current page, showing max. 5 results</p>"
+            "description": "<p>The kind of filter to use</p>"
           },
           {
             "group": "Parameter",
@@ -1123,13 +1122,20 @@
             "optional": false,
             "field": "groupId",
             "description": "<p>Group's id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "participants",
+            "description": "<p>Participating users' ids</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n     filter; \"group\",\n     page: 2,\n     groupId: \"5bbb621c4d7da43f508b9d5a\",\n}",
+          "content": "{\n     \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n     \"participants\": [\"5bdffb3d53618745c0bba83e\", \"5bdffb3d53618745c0bba83e\"]\n}",
           "type": "json"
         }
       ]
@@ -1149,45 +1155,98 @@
             "type": "String",
             "optional": false,
             "field": "recipes._id",
-            "description": "<p>Recipe's id</p>"
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "recipes.authorId",
+            "description": "<p>Author user's id</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "recipes.name",
-            "description": "<p>Recipe's name</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "recipes.author",
-            "description": "<p>Recipe's author</p>"
+            "description": "<p>Name</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "recipes.author._id",
-            "description": "<p>Author's id</p>"
+            "field": "recipes.description",
+            "description": "<p>Description</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "recipes.author.userName",
-            "description": "<p>Author's username</p>"
+            "field": "recipes.imageUrl",
+            "description": "<p>Image URL</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "recipes.servings",
+            "description": "<p>Servings</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "recipes.ratings",
+            "description": "<p>Users ratings of this recipe</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "recipes.ratings.userId",
+            "description": "<p>Rating's user's is</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "recipes.ratings.health",
+            "description": "<p>Health rating</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "recipes.ratings.taste",
+            "description": "<p>Taste rating</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "{\n    recipes: [\n      {\n         _id: \"7zui621c4d7da43f508b9d5a\",\n         name: \"Recipe 1\",\n         author: {\n           _id: \"5bbb621c4d7da43f508b9d5a\",\n           userName: \"TheGreatJoe\"\n         }\n       }\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"recipes\": [\n        {\n            \"_id\": \"5be01b75570f034068fc97af\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Werewolf soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n            \"servings\": 4,\n            \"ratings\": []\n        },\n        {\n            \"_id\": \"5be01dddca9c3f4e801310c9\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Griffin soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and claws of your freshly killed griffin and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhso4837f.jpg\",\n            \"servings\": 10,\n            \"ratings\": []\n        }\n    ]\n}",
           "type": "json"
         }
       ]
+    },
+    "error": {
+      "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>One of the requested parameters is missing</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "FilterInvalid",
+            "description": "<p>The filter is not valid</p>"
+          }
+        ]
+      }
     },
     "version": "0.0.0",
     "filename": "routes/recipes.js",

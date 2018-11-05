@@ -166,29 +166,36 @@ router.get('/:id', findRecipeById, (req, res, next) => {
 router.get('/', (req, res, next) => {
     Recipe.find({}).exec((err, recipes) => {
         if (err) return next(err);
-        return res.status(200).send({recipes:recipes});
+        return res.status(200).send({recipes: recipes});
     });
 });
 
 /**
  * @api {get}   /recipes/filtered/:filter    Filter
- * @apiName     GetRecipes
+ * @apiName     FilterRecipes
  * @apiGroup    Recipe
- * @apiDescription Request a list of recipes, paginated and optionally filtered by
- *  - group (only the recipes that have been added to the given group)
- *  - author (only the recipes that have been created by the given user)
- *  - current user (only the recipes that the current user has rated)
+ * @apiDescription Request a list of recipes, filtered by
+ *  - group
+ *      * Shows the recipes that have been added to the given group
+ *      * Requires `groupId`
+ *  - author
+ *      * Shows the recipes by the given author
+ *      * Requires `authorId`
+ *  - current user
+ *      * Shows the recipes that the current user has rated
+ *  - matching
+ *      * Shows the max. 3 recipes that match best the participating users ratings
+ *      * Requires `groupId` and `participants`
  *
- * @apiParam {String}   filter      The kind of filter to use ("group", "author" or "user")
- * @apiParam {Number}   page        The current page, showing max. 5 results
- * @apiParam {String}   authorId    Author's id
- * @apiParam {String}   groupId     Group's id
+ * @apiParam {String="group", "author", "user", "match"}    filter  The kind of filter to use
+ * @apiParam {String}   authorId        Author's id
+ * @apiParam {String}   groupId         Group's id
+ * @apiParam {String[]} participants    Participating users' ids
  *
  * @apiParamExample Request example
  * {
- *      filter; "group",
- *      page: 2,
- *      groupId: "5bbb621c4d7da43f508b9d5a",
+ *      "groupId": "5bbb621c4d7da43f508b9d5a",
+ *      "participants": ["5bdffb3d53618745c0bba83e", "5bdffb3d53618745c0bba83e"]
  * }
  *
  * @apiSuccess {Object[]}   recipes                 List of recipes
@@ -204,7 +211,7 @@ router.get('/', (req, res, next) => {
  * @apiSuccess {Number}     recipes.ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- *  HTTP/1.1 201 Created
+ *  HTTP/1.1 200 OK
  *  {
  *      "recipes": [
  *          {
@@ -228,41 +235,51 @@ router.get('/', (req, res, next) => {
  *      ]
  *  }
  *
+ * @apiError (400)  MissingData     One of the requested parameters is missing
+ * @apiError (400)  FilterInvalid   The filter is not valid
  */
 router.get('/filtered/:filter', (req, res, next) => {
     let filter = req.params.id;
+    let userId = req.userId;
+    let groupId = req.body.groupId || null;
+    let authorId = req.body.authorId || null;
+    let participants = req.body.participants || null;
 
-    // Get recipes filtered by group
-    if (filter === 'group') {
-        let groupId = req.body.groupId;
-        if (!groupId) return res.status(400).send('NoGroupId');
-        Group.where({_id: groupId}).findOne((err, group) => {
-            if (err) return next(err);
-            if (!group) return res.status(400).send('GroupNotFound');
-            Recipe.find().where('_id').in(group.recipes).sort('name').exec((err, recipes) => {
+    switch (filter) {
+        // Get recipes filtered by group TODO: test
+        case 'group':
+            if (!groupId) return res.status(400).send('MissingData');
+            Group.where({_id: groupId}).findOne((err, group) => {
+                if (err) return next(err);
+                if (!group) return res.status(400).send('GroupNotFound');
+                Recipe.find().where('_id').in(group.recipes).sort('name').exec((err, recipes) => {
+                    if (err) return next(err);
+                    return res.status(200).send({recipes: recipes});
+                });
+            });
+            break;
+        // Get recipes filtered by author TODO: test
+        case 'author':
+            if (!authorId) return res.status(400).send('MissingData');
+            Recipe.find({authorId: authorId}).sort('name').exec((err, recipes) => {
                 if (err) return next(err);
                 return res.status(200).send(recipes);
             });
-        });
+            break;
+        // Get recipes that the current user rated TODO: test
+        case 'user':
+            Recipe.find({'ratings.userId': userId}).sort('name').exec((err, recipes) => {
+                if (err) return next(err);
+                return res.status(200).send(recipes);
+            });
+            break;
+        // Match recipes for a meal planning TODO: matching
+        case 'match':
+            if(!groupId || !participants) return res.status(400).send('MissingData');
+            break;
+        default:
+            return res.status(400).send('FilterInvalid');
     }
-    // Get recipes filtered by author
-    else if (filter === 'author') {
-        let authorId = req.body.authorId;
-        if (!authorId) return res.status(400).send('NoAuthorId');
-        Recipe.find({authorId: authorId}).sort('name').exec((err, recipes) => {
-            if (err) return next(err);
-            return res.status(200).send(recipes);
-        });
-    }
-    // Get recipes filtered by current user
-    else if (filter === 'user') {
-        let userId = req.userId;
-        Recipe.find({'ratings.userId': userId}).sort('name').exec((err, recipes) => {
-            if (err) return next(err);
-            return res.status(200).send(recipes);
-        });
-    }
-
 });
 
 /**
