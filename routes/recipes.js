@@ -386,21 +386,22 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
 });
 
 /**
- * @api {delete} /recipes/:id  Delete
- * @apiName DeleteRecipe
- * @apiGroup Recipe
- * @apiDescription Delete a recipe
+ * @api {delete}    /recipes/:id    Delete
+ * @apiName         DeleteRecipe
+ * @apiGroup        Recipe
+ * @apiDescription  Delete a recipe
  * - The authenticated user must be the author of the recipe
  *
- * @apiParam {String} id    Recipe's id
+ * @apiParam {String}   id              Recipe's id
  *
- * @apiSuccess (200)    Success     Recipe was deleted
+ * @apiSuccess  (204)   Success         Recipe was deleted
  *
- * @apiError (404)  RecipeNotFound   Recipe was not found
+ * @apiError    (404)   RecipeNotFound  Recipe was not found
+ * @apiError    (403)   NotAllowed      Authenticated user is not the author
  */
 router.delete('/:id', findRecipeById, (req, res, next) => {
-    if (req.recipe.authorId !== req.userId) res.sendStatus(403);
-    req.recipe.remove(function (err) {
+    if (req.recipe.authorId !== req.userId) res.status(403).send('NotAllowed');
+    req.recipe.remove((err) => {
         if (err) return next(err);
         res.sendStatus(204);
     });
