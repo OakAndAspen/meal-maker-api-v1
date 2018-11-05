@@ -1633,15 +1633,29 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
+            "field": "users.email",
+            "description": "<p>Email</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
             "field": "users.userName",
             "description": "<p>Username</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "DateTime",
+            "optional": false,
+            "field": "users.registration",
+            "description": "<p>Registration date</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    users: [\n      {id: \"5bbb621c4d7da43f508b9d5a\", userName: \"TheAwesomeUser\"}\n      {id: \"5bbb61284d7da43f508b9d59\", userName: \"TheOtherAwesomeUser\"}\n      {id: \"5bd7083ed584b00d1c768f2e\", userName: \"YetAgainAnAwesomeUser\"}\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"users\": [\n        {\n            \"_id\": \"5bdfe46d7c9e2801085676bf\",\n            \"email\": \"ciri@ofrivia.com\",\n            \"userName\": \"SilverHair\",\n            \"registration\": \"2018-11-05T06:34:21.286Z\"\n        },\n        {\n            \"_id\": \"5bdfe0b2de9718419037ddc6\",\n            \"email\": \"geralt@ofrivia.com\",\n            \"userName\": \"TheWeetchr\",\n            \"registration\": \"2018-11-05T06:18:26.360Z\",\n        }\n    ]\n}",
           "type": "json"
         }
       ]

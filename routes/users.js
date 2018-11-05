@@ -32,30 +32,40 @@ router.get('/:id', findUserById, (req, res, next) => {
 });
 
 /**
- * TODO: only show partial information
  * @api {get} /users Index
  * @apiName GetUsers
  * @apiGroup User
  * @apiDescription Request a list of users
  *
- * @apiSuccess {Object[]}   users           List of users
- * @apiSuccess {Number}     users.id        Id
- * @apiSuccess {String}     users.userName  Username
+ * @apiSuccess {Object[]}   users               List of users
+ * @apiSuccess {Number}     users.id            Id
+ * @apiSuccess {String}     users.email         Email
+ * @apiSuccess {String}     users.userName      Username
+ * @apiSuccess {DateTime}   users.registration  Registration date
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *     users: [
- *       {id: "5bbb621c4d7da43f508b9d5a", userName: "TheAwesomeUser"}
- *       {id: "5bbb61284d7da43f508b9d59", userName: "TheOtherAwesomeUser"}
- *       {id: "5bd7083ed584b00d1c768f2e", userName: "YetAgainAnAwesomeUser"}
- *     ]
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "users": [
+ *          {
+ *              "_id": "5bdfe46d7c9e2801085676bf",
+ *              "email": "ciri@ofrivia.com",
+ *              "userName": "SilverHair",
+ *              "registration": "2018-11-05T06:34:21.286Z"
+ *          },
+ *          {
+ *              "_id": "5bdfe0b2de9718419037ddc6",
+ *              "email": "geralt@ofrivia.com",
+ *              "userName": "TheWeetchr",
+ *              "registration": "2018-11-05T06:18:26.360Z",
+ *          }
+ *      ]
+ *  }
  */
 router.get('/', (req, res, next) => {
     User.find().sort('userName').exec(function (err, users) {
         if (err) return next(err);
-        res.send(users);
+        return res.status(200).send({"users":users});
     });
 });
 
