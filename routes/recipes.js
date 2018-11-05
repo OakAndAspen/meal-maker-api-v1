@@ -186,7 +186,7 @@ router.get('/', (req, res, next) => {
  *  - current user
  *      * Shows the recipes that the current user has rated
  *  - matching
- *      * Shows the max. 3 recipes that match best the participating users ratings
+ *      * Shows the 3 recipes added to the group that match best the participating users ratings
  *      * Requires `groupId` and `participants`
  *
  * @apiParam {String="group", "author", "user", "match"}    filter  The kind of filter to use
@@ -194,11 +194,11 @@ router.get('/', (req, res, next) => {
  * @apiParam {String}   groupId         Group's id
  * @apiParam {String[]} participants    Participating users' ids
  *
- * @apiParamExample Request example
- * {
- *      "groupId": "5bbb621c4d7da43f508b9d5a",
- *      "participants": ["5bdffb3d53618745c0bba83e", "5bdffb3d53618745c0bba83e"]
- * }
+ * @apiExample URL example
+ *  /recipes/filtered/match?
+ *      groupId=5be00126b1dd7244940b9c6d
+ *      &participants=5bdffb8653618745c0bba83f
+ *      &participants=5bdffb3d53618745c0bba83e
  *
  * @apiSuccess {Object[]}   recipes                 List of recipes
  * @apiSuccess {String}     recipes._id             Id
@@ -208,7 +208,7 @@ router.get('/', (req, res, next) => {
  * @apiSuccess {String}     recipes.imageUrl        Image URL
  * @apiSuccess {Number}     recipes.servings        Servings
  * @apiSuccess {Object[]}   recipes.ratings         Users ratings of this recipe
- * @apiSuccess {String}     recipes.ratings.userId  Rating's user's is
+ * @apiSuccess {String}     recipes.ratings.userId  Rating's user's id
  * @apiSuccess {Number}     recipes.ratings.health  Health rating
  * @apiSuccess {Number}     recipes.ratings.taste   Taste rating
  *
@@ -241,14 +241,14 @@ router.get('/', (req, res, next) => {
  * @apiError (400)  FilterInvalid   The filter is not valid
  */
 router.get('/filtered/:filter', (req, res, next) => {
-    let filter = req.params.id;
+    let filter = req.params.filter;
     let userId = req.userId;
-    let groupId = req.body.groupId || null;
-    let authorId = req.body.authorId || null;
-    let participants = req.body.participants || null;
+    let groupId = req.query.groupId || null;
+    let authorId = req.query.authorId || null;
+    let participants = req.query.participants || null;
 
     switch (filter) {
-        // Get recipes filtered by group TODO: test
+        // Get recipes filtered by group
         case 'group':
             if (!groupId) return res.status(400).send('MissingData');
             Group.where({_id: groupId}).findOne((err, group) => {
@@ -260,7 +260,7 @@ router.get('/filtered/:filter', (req, res, next) => {
                 });
             });
             break;
-        // Get recipes filtered by author TODO: test
+        // Get recipes filtered by author
         case 'author':
             if (!authorId) return res.status(400).send('MissingData');
             Recipe.find({authorId: authorId}).sort('name').exec((err, recipes) => {
@@ -268,16 +268,28 @@ router.get('/filtered/:filter', (req, res, next) => {
                 return res.status(200).send(recipes);
             });
             break;
-        // Get recipes that the current user rated TODO: test
+        // Get recipes that the authenticated user has rated
         case 'user':
             Recipe.find({'ratings.userId': userId}).sort('name').exec((err, recipes) => {
                 if (err) return next(err);
                 return res.status(200).send(recipes);
             });
             break;
-        // Match recipes for a meal planning TODO: matching
+        // Match recipes for a meal planning
         case 'match':
-            if(!groupId || !participants) return res.status(400).send('MissingData');
+            if (!groupId || !participants) return res.status(400).send('MissingData');
+            Group.where({_id: groupId}).findOne((err, group) => {
+                if (err) return next(err);
+                if (!group) return res.status(400).send('GroupNotFound');
+                Recipe.find().where('_id').in(group.recipes).sort('name').exec((err, recipes) => {
+                    if (err) return next(err);
+                    recipes.sort((a, b) => {
+                        return calculateGrade(a, participants) > calculateGrade(b, participants) ? -1 : 1;
+                    });
+                    recipes = recipes.slice(0, 3);
+                    return res.status(200).send({recipes: recipes});
+                });
+            });
             break;
         default:
             return res.status(400).send('FilterInvalid');
@@ -349,34 +361,34 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
     let rating = req.body.rating || null;
 
     // Checking if a non-author is trying to edit other informations
-    if((name || description || imageUrl || servings) && recipe.authorId !== userId) {
+    if ((name || description || imageUrl || servings) && recipe.authorId !== userId) {
         return res.status(403).send('NotAllowed');
     }
 
     // Updating the recipe's info
-    if(name) {
+    if (name) {
         if (name.length < 3) return res.status(400).send('NameTooShort');
         recipe.name = name;
     }
-    if(servings) {
+    if (servings) {
         if (isNaN(servings) || servings < 1) return res.status(400).send('ServingsInvalid');
         recipe.servings = servings;
     }
-    if(description) recipe.description = description;
-    if(imageUrl) recipe.imageUrl = imageUrl;
+    if (description) recipe.description = description;
+    if (imageUrl) recipe.imageUrl = imageUrl;
 
     // Updating the ratings
-    if(rating) {
-        if(!rating.health || !rating.taste) return res.status(400).send('MissingData');
+    if (rating) {
+        if (!rating.health || !rating.taste) return res.status(400).send('MissingData');
         rating.userId = userId;
         let ratingExists = false;
         recipe.ratings = recipe.ratings.map(r => {
-            if(r.userId === userId) {
-                ratingExists= true;
+            if (r.userId === userId) {
+                ratingExists = true;
                 return rating;
             }
         });
-        if(!ratingExists) recipe.ratings.push(rating);
+        if (!ratingExists) recipe.ratings.push(rating);
     }
 
     recipe.save((err, updatedRecipe) => {
@@ -416,5 +428,18 @@ function findRecipeById(req, res, next) {
         next();
     });
 }
+
+function calculateGrade(recipe, participants) {
+    let ratingsCount = 0;
+    let ratingsSum = 0;
+    for (let ra of recipe.ratings) {
+        if (participants.includes(ra.userId)) {
+            ratingsCount++;
+            ratingsSum += (0 + ra.health + ra.taste);
+        }
+    }
+    return ratingsCount ? ratingsSum / ratingsCount : 0;
+}
+
 
 module.exports = router;

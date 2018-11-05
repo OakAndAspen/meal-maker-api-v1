@@ -1172,7 +1172,7 @@
     "title": "Filter",
     "name": "FilterRecipes",
     "group": "Recipe",
-    "description": "<p>Request a list of recipes, filtered by</p> <ul> <li>group <ul> <li>Shows the recipes that have been added to the given group</li> <li>Requires <code>groupId</code></li> </ul> </li> <li>author <ul> <li>Shows the recipes by the given author</li> <li>Requires <code>authorId</code></li> </ul> </li> <li>current user <ul> <li>Shows the recipes that the current user has rated</li> </ul> </li> <li>matching <ul> <li>Shows the max. 3 recipes that match best the participating users ratings</li> <li>Requires <code>groupId</code> and <code>participants</code></li> </ul> </li> </ul>",
+    "description": "<p>Request a list of recipes, filtered by</p> <ul> <li>group <ul> <li>Shows the recipes that have been added to the given group</li> <li>Requires <code>groupId</code></li> </ul> </li> <li>author <ul> <li>Shows the recipes by the given author</li> <li>Requires <code>authorId</code></li> </ul> </li> <li>current user <ul> <li>Shows the recipes that the current user has rated</li> </ul> </li> <li>matching <ul> <li>Shows the 3 recipes added to the group that match best the participating users ratings</li> <li>Requires <code>groupId</code> and <code>participants</code></li> </ul> </li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1211,15 +1211,15 @@
             "description": "<p>Participating users' ids</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "Request example",
-          "content": "{\n     \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n     \"participants\": [\"5bdffb3d53618745c0bba83e\", \"5bdffb3d53618745c0bba83e\"]\n}",
-          "type": "json"
-        }
-      ]
+      }
     },
+    "examples": [
+      {
+        "title": "URL example",
+        "content": "/recipes/filtered/match?\n    groupId=5be00126b1dd7244940b9c6d\n    &participants=5bdffb8653618745c0bba83f\n    &participants=5bdffb3d53618745c0bba83e",
+        "type": "json"
+      }
+    ],
     "success": {
       "fields": {
         "Success 200": [
@@ -1284,7 +1284,7 @@
             "type": "String",
             "optional": false,
             "field": "recipes.ratings.userId",
-            "description": "<p>Rating's user's is</p>"
+            "description": "<p>Rating's user's id</p>"
           },
           {
             "group": "Success 200",
