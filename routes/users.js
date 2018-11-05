@@ -92,7 +92,19 @@ router.get('/', (req, res, next) => {
  *     "password": "Yennefer4Ever"
  * }
  *
- * @apiSuccess  (204) UserWasUpdated    User was updated
+ * @apiSuccess  {String}    _id             Id
+ * @apiSuccess  {String}    userName        Username
+ * @apiSuccess  {String}    email           Email address
+ * @apiSuccess  {String}    registration    Registration date
+ *
+ * @apiSuccessExample Response example
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5bdfe46d7c9e2801085676bf",
+ *      "email": "ciri@ofrivia.com",
+ *      "userName": "SilverHair",
+ *      "registration": "2018-11-05T06:34:21.286Z",
+ *  }
  *
  * @apiError    (404) UserNotFound      User was not found
  * @apiError    (403) NotAllowed        Authenticated user is not allowed to do this
@@ -116,7 +128,7 @@ router.patch('/:id', findUserById, (req, res, next) => {
         user.password = hashedPassword;
         user.save((err, updatedUser) => {
             if (err) return next(err);
-            return res.status(204).send('UserWasUpdated');
+            return res.status(200).send(updatedUser);
         });
     });
 });
@@ -128,10 +140,10 @@ router.patch('/:id', findUserById, (req, res, next) => {
  * @apiDescription  Delete a user
  * - The authenticated user can only delete itself
  *
- * @apiParam {String} id    Id
+ * @apiParam {String}   id              Id
  *
- * @apiSuccess  (204)   UserWasDeleted  User was deleted
- *
+ * @apiSuccess  (204)   Success         User was deleted
+ * @apiError    (403)   NotAllowed      Authenticated user is trying to delete another user
  * @apiError    (404)   UserNotFound    User was not found
  */
 router.delete('/:id', findUserById, (req, res, next) => {
@@ -139,7 +151,7 @@ router.delete('/:id', findUserById, (req, res, next) => {
     if (user._id.toString() !== req.userId.toString()) return res.status(403).send('NotAllowed');
     user.remove(function (err) {
         if (err) return next(err);
-        return res.status(204).send('UserWasDeleted');
+        return res.sendStatus(204);
     });
 });
 

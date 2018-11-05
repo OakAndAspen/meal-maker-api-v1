@@ -5,10 +5,10 @@ const User = require('../models/user');
 const Recipe = require('../models/recipe');
 
 /**
- * @api {post}  /groups     Create
- * @apiName     PostGroup
- * @apiGroup    Group
- * @apiDescription          Create a new group
+ * @api {post}      /groups     Create
+ * @apiName         PostGroup
+ * @apiGroup        Group
+ * @apiDescription  Create a new group
  * - The name must be at least 3 characters long
  * - There must be at least 2 members
  * - If the authenticated user is not listed in the members, it is automatically added
@@ -31,7 +31,7 @@ const Recipe = require('../models/recipe');
  * @apiSuccess (201) {String[]} recipes     Recipes ids
  *
  * @apiSuccessExample Response example
- *  HTTP/1.1 200 OK
+ *  HTTP/1.1 201 Created
  *  {
  *      "_id": "5be00086ba644a266c20906e",
  *      "name": "RedBaronCastle",
@@ -71,10 +71,10 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get}   /groups/:id Show
- * @apiName     GetGroup
- * @apiGroup    Group
- * @apiDescription Request a group's info
+ * @api {get}       /groups/:id Show
+ * @apiName         GetGroup
+ * @apiGroup        Group
+ * @apiDescription  Request a group's info
  * - The authenticated user must be part of that group
  *
  * @apiParam    {String}    id              Id
@@ -101,10 +101,10 @@ router.get('/:id', getGroup, (req, res) => {
 });
 
 /**
- * @api {get}   /groups Index
- * @apiName     GetGroups
- * @apiGroup    Group
- * @apiDescription Request a list of all groups the user is in
+ * @api {get}       /groups     Index
+ * @apiName         GetGroups
+ * @apiGroup        Group
+ * @apiDescription  Request a list of all groups the user is in
  *
  * @apiSuccess {Object[]}   groups          List of groups
  * @apiSuccess {String}     groups._id      Id
@@ -139,10 +139,10 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {patch} /groups/:id  Update
- * @apiName PatchGroup
- * @apiGroup Group
- * @apiDescription Update an existing group
+ * @api {patch}     /groups/:id Update
+ * @apiName         PatchGroup
+ * @apiGroup        Group
+ * @apiDescription  Update an existing group
  * - The authenticated user must be part of that group
  * - The name must be at least 3 characters long
  * - There must be at least 2 members
@@ -161,7 +161,22 @@ router.get('/', (req, res, next) => {
  *      ]
  *  }
  *
- * @apiSuccess  (204)   GroupWasUpdated Group was updated
+ * @apiSuccess {String}   _id         Id
+ * @apiSuccess {String}   name        Name
+ * @apiSuccess {String[]} members     Participating users ids
+ * @apiSuccess {String[]} recipes     Recipes ids
+ *
+ * @apiSuccessExample Response example
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5be00086ba644a266c20906e",
+ *      "name": "RedBaronCastle",
+ *      "members": [
+ *          "5bdffb8653618745c0bba83f",
+ *          "5bdffb3d53618745c0bba83e"
+ *       ],
+ *      "recipes": []
+ *  }
  *
  * @apiError    (404)   GroupNotFound   Group was not found
  * @apiError    (404)   UserNotFound    User was not found
@@ -208,7 +223,7 @@ router.patch('/:id', getGroup, (req, res, next) => {
     Promise.all([checkMembers, checkRecipes]).then(() => {
         group.save((err, group) => {
             if (err) return next(err);
-            return res.status(204).send('GroupWasUpdated');
+            return res.status(200).send(group);
         });
     });
 });
@@ -220,17 +235,16 @@ router.patch('/:id', getGroup, (req, res, next) => {
  * @apiDescription  Delete a group
  * - The authenticated user must be part of that group
  *
- * @apiParam {String} id    Id
+ * @apiParam {String}   id              Id
  *
- * @apiSuccess  (204)   GroupWasDeleted Group was deleted
- *
+ * @apiSuccess  (204)   Success         Group was deleted
  * @apiError    (404)   GroupNotFound   Group was not found
- * @apiError    (403)   NotAllowed      Authenticated user if not part of that group
+ * @apiError    (403)   NotAllowed      Authenticated user is not part of that group
  */
 router.delete('/:id', getGroup, (req, res, next) => {
     req.group.remove(function (err) {
         if (err) return next(err);
-        return res.status(204).send('GroupWasDeleted');
+        return res.sendStatus(204);
     });
 });
 

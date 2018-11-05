@@ -5,10 +5,10 @@ const Group = require('../models/group');
 const Recipe = require('../models/recipe');
 
 /**
- * @api {post}  /meals  Create
- * @apiName     PostMeal
- * @apiGroup    Meal
- * @apiDescription Create a new meal
+ * @api {post}      /meals      Create
+ * @apiName         PostMeal
+ * @apiGroup        Meal
+ * @apiDescription  Create a new meal
  * - All participants must be members of the group
  * - The date must be in the future
  *
@@ -99,10 +99,10 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get}   /meals/:id  Show
- * @apiName     GetMeal
- * @apiGroup    Meal
- * @apiDescription Request a meal's info
+ * @api {get}       /meals/:id  Show
+ * @apiName         GetMeal
+ * @apiGroup        Meal
+ * @apiDescription  Request a meal's info
  *
  * @apiParam    {String}    id              Meal's id
  *
@@ -125,15 +125,15 @@ router.post('/', (req, res, next) => {
  * @apiError (404)  MealNotFound    Meal was not found
  * @apiError (403)  NotAllowed      Authenticated user is not participating in the meal
  */
-router.get('/:id', findMealById, (req, res, next) => {
+router.get('/:id', findMealById, (req, res) => {
     return res.status(200).send(req.meal);
 });
 
 /**
- * @api {get}   /meals Index
- * @apiName     GetMeals
- * @apiGroup    Meal
- * @apiDescription Request a list of meals the authenticated user participates in
+ * @api {get}       /meals      Index
+ * @apiName         GetMeals
+ * @apiGroup        Meal
+ * @apiDescription  Request a list of meals the authenticated user participates in
  *
  * @apiSuccess  {Object[]}  meals               List of meals
  * @apiSuccess  {String}    meals._id           Id
@@ -267,7 +267,6 @@ router.patch('/:id', findMealById, (req, res, next) => {
  * @apiParam {String}   id              Meal's id
  *
  * @apiSuccess  (204)   Success         Meal was deleted
- *
  * @apiError    (404)   MealNotFound    Meal was not found
  * @apiError    (403)   NotAllowed      Authenticated user is not participating in the meal
  */

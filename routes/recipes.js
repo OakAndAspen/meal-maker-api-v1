@@ -4,10 +4,10 @@ const Recipe = require('../models/recipe');
 const Group = require('../models/group');
 
 /**
- * @api {post}  /recipes Create
- * @apiName     PostRecipe
- * @apiGroup    Recipe
- * @apiDescription Create a new recipe
+ * @api {post}      /recipes        Create
+ * @apiName         PostRecipe
+ * @apiGroup        Recipe
+ * @apiDescription  Create a new recipe
  * - The authenticated user will be used as author
  * - The name must be at least 3 characters long
  * - The servings amount must be >= 1
@@ -78,10 +78,10 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get}   /recipes/:id    Show
- * @apiName     GetRecipe
- * @apiGroup    Recipe
- * @apiDescription Request a recipe's info
+ * @api {get}       /recipes/:id    Show
+ * @apiName         GetRecipe
+ * @apiGroup        Recipe
+ * @apiDescription  Request a recipe's info
  *
  * @apiParam    {String} id    Id
  *
@@ -110,15 +110,15 @@ router.post('/', (req, res, next) => {
  *
  * @apiError (404)  RecipeNotFound    Recipe was not found
  */
-router.get('/:id', findRecipeById, (req, res, next) => {
-    res.status(200).send(req.recipe);
+router.get('/:id', findRecipeById, (req, res) => {
+    return res.status(200).send(req.recipe);
 });
 
 /**
- * @api {get}   /recipes Index
- * @apiName     GetRecipes
- * @apiGroup    Recipe
- * @apiDescription Request a list of recipes, paginated, with a max. of 5 recipes per page
+ * @api {get}       /recipes        Index
+ * @apiName         GetRecipes
+ * @apiGroup        Recipe
+ * @apiDescription  Request a list of recipes, paginated, with a max. of 5 recipes per page
  *
  * @apiParam {Number}   [page]  The current page, showing max. 5 results
  *
@@ -138,7 +138,7 @@ router.get('/:id', findRecipeById, (req, res, next) => {
  * @apiSuccess {Number}     recipes.ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- *  HTTP/1.1 201 Created
+ *  HTTP/1.1 200 OK
  *  {
  *      "recipes": [
  *          {
@@ -172,10 +172,10 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * @api {get}   /recipes/filtered/:filter    Filter
- * @apiName     FilterRecipes
- * @apiGroup    Recipe
- * @apiDescription Request a list of recipes, filtered by
+ * @api {get}       /recipes/filtered/:filter   Filter
+ * @apiName         FilterRecipes
+ * @apiGroup        Recipe
+ * @apiDescription  Request a list of recipes, filtered by
  *  - group
  *      * Shows the recipes that have been added to the given group
  *      * Requires `groupId`
@@ -296,10 +296,10 @@ router.get('/filtered/:filter', (req, res, next) => {
 });
 
 /**
- * @api {patch} /recipes/:id Update
- * @apiName PatchRecipe
- * @apiGroup Recipe
- * @apiDescription Update an existing recipe
+ * @api {patch}     /recipes/:id    Update
+ * @apiName         PatchRecipe
+ * @apiGroup        Recipe
+ * @apiDescription  Update an existing recipe
  * - Only the author can update properties other than the rating
  * - Users can only update their own rating
  *
@@ -406,15 +406,14 @@ router.patch('/:id', findRecipeById, (req, res, next) => {
  * @apiParam {String}   id              Recipe's id
  *
  * @apiSuccess  (204)   Success         Recipe was deleted
- *
  * @apiError    (404)   RecipeNotFound  Recipe was not found
  * @apiError    (403)   NotAllowed      Authenticated user is not the author
  */
 router.delete('/:id', findRecipeById, (req, res, next) => {
-    if (req.recipe.authorId !== req.userId) res.status(403).send('NotAllowed');
+    if (req.recipe.authorId !== req.userId) return res.status(403).send('NotAllowed');
     req.recipe.remove((err) => {
         if (err) return next(err);
-        res.sendStatus(204);
+        return res.sendStatus(204);
     });
 });
 

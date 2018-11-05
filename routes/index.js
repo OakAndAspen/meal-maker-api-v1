@@ -5,10 +5,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 /**
- * @api {post} /login Log in
- * @apiName Login
- * @apiGroup Authentication
- * @apiDescription Checks the given credentials and returns an authentication token
+ * @api {post}      /login  Log in
+ * @apiName         Login
+ * @apiGroup        Authentication
+ * @apiDescription  Checks the given credentials and returns an authentication token
  *
  * @apiParam {String}   userName    Username
  * @apiParam {String}   password    Password
@@ -60,10 +60,10 @@ router.post('/login', (req, res, next) => {
 });
 
 /**
- * @api {post} /signup Sign up
- * @apiName Sign up
- * @apiGroup Authentication
- * @apiDescription User signup
+ * @api {post}      /signup Sign up
+ * @apiName         Sign up
+ * @apiGroup        Authentication
+ * @apiDescription  User signup
  * - The email address and username must be unique
  * - The password must be at least 6 characters long and contain at least a number and a letter
  *
@@ -78,13 +78,13 @@ router.post('/login', (req, res, next) => {
  *      "password": "ikillghosts4pleasure"
  *  }
  *
- * @apiSuccess {String}   _id           Id
- * @apiSuccess {String}   email         Email
- * @apiSuccess {String}   userName      Username
- * @apiSuccess {String}   registration  Registration date
+ * @apiSuccess (201) {String}   _id           Id
+ * @apiSuccess (201) {String}   email         Email
+ * @apiSuccess (201) {String}   userName      Username
+ * @apiSuccess (201) {String}   registration  Registration date
  *
  * @apiSuccessExample Response example
- *  HTTP/1.1 200 OK
+ *  HTTP/1.1 201 Created
  *  {
  *      "_id": "5bdfe0b2de9718419037ddc6",
  *      "email": "geralt@ofrivia.com",
