@@ -44,9 +44,8 @@ app.use(function (req, res, next) {
 });
 
 // Error handler
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.send({error: err.message});
+app.use(function (err, req, res) {
+    return res.status(err.status || 500).send(err.message);
 });
 
 // Authentication middleware

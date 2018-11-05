@@ -126,30 +126,30 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "Success 200": [
+        "201": [
           {
-            "group": "Success 200",
+            "group": "201",
             "type": "String",
             "optional": false,
             "field": "_id",
             "description": "<p>Id</p>"
           },
           {
-            "group": "Success 200",
+            "group": "201",
             "type": "String",
             "optional": false,
             "field": "email",
             "description": "<p>Email</p>"
           },
           {
-            "group": "Success 200",
+            "group": "201",
             "type": "String",
             "optional": false,
             "field": "userName",
             "description": "<p>Username</p>"
           },
           {
-            "group": "Success 200",
+            "group": "201",
             "type": "String",
             "optional": false,
             "field": "registration",
@@ -160,7 +160,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5bdfe0b2de9718419037ddc6\",\n    \"email\": \"geralt@ofrivia.com\",\n    \"userName\": \"TheWeetchr\",\n    \"registration\": \"2018-11-05T06:18:26.360Z\"\n}",
+          "content": "HTTP/1.1 201 Created\n{\n    \"_id\": \"5bdfe0b2de9718419037ddc6\",\n    \"email\": \"geralt@ofrivia.com\",\n    \"userName\": \"TheWeetchr\",\n    \"registration\": \"2018-11-05T06:18:26.360Z\"\n}",
           "type": "json"
         }
       ]
@@ -225,7 +225,7 @@ define({ "api": [
           {
             "group": "204",
             "optional": false,
-            "field": "GroupWasDeleted",
+            "field": "Success",
             "description": "<p>Group was deleted</p>"
           }
         ]
@@ -238,7 +238,7 @@ define({ "api": [
             "group": "403",
             "optional": false,
             "field": "NotAllowed",
-            "description": "<p>Authenticated user if not part of that group</p>"
+            "description": "<p>Authenticated user is not part of that group</p>"
           }
         ],
         "404": [
@@ -449,15 +449,44 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "204": [
+        "Success 200": [
           {
-            "group": "204",
+            "group": "Success 200",
+            "type": "String",
             "optional": false,
-            "field": "GroupWasUpdated",
-            "description": "<p>Group was updated</p>"
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "members",
+            "description": "<p>Participating users ids</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "recipes",
+            "description": "<p>Recipes ids</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Response example",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be00086ba644a266c20906e\",\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\n        \"5bdffb8653618745c0bba83f\",\n        \"5bdffb3d53618745c0bba83e\"\n     ],\n    \"recipes\": []\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
@@ -565,7 +594,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be00086ba644a266c20906e\",\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\n        \"5bdffb8653618745c0bba83f\",\n        \"5bdffb3d53618745c0bba83e\"\n     ],\n    \"recipes\": []\n}",
+          "content": "HTTP/1.1 201 Created\n{\n    \"_id\": \"5be00086ba644a266c20906e\",\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\n        \"5bdffb8653618745c0bba83f\",\n        \"5bdffb3d53618745c0bba83e\"\n     ],\n    \"recipes\": []\n}",
           "type": "json"
         }
       ]
@@ -1557,7 +1586,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 201 Created\n{\n    \"recipes\": [\n        {\n            \"_id\": \"5be01b75570f034068fc97af\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Werewolf soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n            \"servings\": 4,\n            \"ratings\": []\n        },\n        {\n            \"_id\": \"5be01dddca9c3f4e801310c9\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Griffin soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and claws of your freshly killed griffin and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhso4837f.jpg\",\n            \"servings\": 10,\n            \"ratings\": []\n        }\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"recipes\": [\n        {\n            \"_id\": \"5be01b75570f034068fc97af\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Werewolf soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n            \"servings\": 4,\n            \"ratings\": []\n        },\n        {\n            \"_id\": \"5be01dddca9c3f4e801310c9\",\n            \"authorId\": \"5bdffb3d53618745c0bba83e\",\n            \"name\": \"Griffin soup\",\n            \"description\": \"A witcher delicacy! Juste take the eyes and claws of your freshly killed griffin and boil them in orange juice.\",\n            \"imageUrl\": \"//cdn.myapp.net/img/jhso4837f.jpg\",\n            \"servings\": 10,\n            \"ratings\": []\n        }\n    ]\n}",
           "type": "json"
         }
       ]
@@ -1962,7 +1991,7 @@ define({ "api": [
           {
             "group": "204",
             "optional": false,
-            "field": "UserWasDeleted",
+            "field": "Success",
             "description": "<p>User was deleted</p>"
           }
         ]
@@ -1970,6 +1999,14 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is trying to delete another user</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
@@ -2156,15 +2193,44 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "204": [
+        "Success 200": [
           {
-            "group": "204",
+            "group": "Success 200",
+            "type": "String",
             "optional": false,
-            "field": "UserWasUpdated",
-            "description": "<p>User was updated</p>"
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "userName",
+            "description": "<p>Username</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>Email address</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "registration",
+            "description": "<p>Registration date</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Response example",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5bdfe46d7c9e2801085676bf\",\n    \"email\": \"ciri@ofrivia.com\",\n    \"userName\": \"SilverHair\",\n    \"registration\": \"2018-11-05T06:34:21.286Z\",\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
