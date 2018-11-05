@@ -144,24 +144,29 @@ router.get('/', (req, res, next) => {
  * @apiGroup Group
  * @apiDescription Update an existing group
  * - The authenticated user must be part of that group
+ * - The name must be at least 3 characters long
+ * - There must be at least 2 members
  *
  * @apiParam {String}       id          Id
  * @apiParam {String}       [name]      Name
  * @apiParam {String[]}     [members]   Participating users' ids
  * @apiParam {String[]}     [recipes]   Recipes' ids
  *
- * @apiParamExample
- * {
- *     name: "Group's name",
- *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"],
- *     recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d5a"]
- * }
+ * @apiParamExample Request example
+ *  {
+ *      "members": [
+ *          "5bdfe46d7c9e2801085676bf",
+ *          "5bdffb3d53618745c0bba83e",
+ *          "5bdffb8653618745c0bba83f"
+ *      ]
+ *  }
  *
- * @apiSuccess (200)    Success     Group was updated
+ * @apiSuccess  (204)   GroupWasUpdated Group was updated
  *
- * @apiError (404)  GroupNotFound   Group was not found
- * @apiError (404)  UserNotFound    User was not found
- * @apiError (404)  RecipeNotFound  Recipe was not found
+ * @apiError    (404)   GroupNotFound   Group was not found
+ * @apiError    (404)   UserNotFound    User was not found
+ * @apiError    (404)   RecipeNotFound  Recipe was not found
+ * @apiError    (403)   NotAllowed      Authenticated user is not part of that group
  */
 router.patch('/:id', getGroup, (req, res, next) => {
     let group = req.group;
@@ -176,8 +181,9 @@ router.patch('/:id', getGroup, (req, res, next) => {
     }
 
     // Update the members
-    let uM = new Promise((resolve) => {
-        if (!members) return resolve(group.members);
+    let checkMembers = new Promise((resolve) => {
+        if (!members) return resolve();
+        members = members.filter((m, i) => members.indexOf(m) === i);
         if (members.length < 2) return res.status(400).send('NotEnoughMembers');
         User.where('_id').in(members).find((err, existingMembers) => {
             if (err) return next(err);
@@ -188,8 +194,9 @@ router.patch('/:id', getGroup, (req, res, next) => {
     });
 
     // Update the recipes
-    let uR = new Promise((resolve) => {
-        if (!recipes) return resolve(group.recipes);
+    let checkRecipes = new Promise((resolve) => {
+        if (!recipes) return resolve();
+        recipes = recipes.filter((r, i) => recipes.indexOf(r) === i);
         Recipe.where('_id').in(recipes).find((err, existingRecipes) => {
             if (err) return next(err);
             if (recipes.length !== existingRecipes.length) return res.status(404).send('RecipeNotFound');
@@ -198,10 +205,10 @@ router.patch('/:id', getGroup, (req, res, next) => {
         });
     });
 
-    Promise.all([uM, uR]).then(() => {
+    Promise.all([checkMembers, checkRecipes]).then(() => {
         group.save((err, group) => {
             if (err) return next(err);
-            return res.status(201).send(group);
+            return res.status(204).send('GroupWasUpdated');
         });
     });
 });

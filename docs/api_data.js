@@ -405,7 +405,7 @@ define({ "api": [
     "title": "Update",
     "name": "PatchGroup",
     "group": "Group",
-    "description": "<p>Update an existing group</p> <ul> <li>The authenticated user must be part of that group</li> </ul>",
+    "description": "<p>Update an existing group</p> <ul> <li>The authenticated user must be part of that group</li> <li>The name must be at least 3 characters long</li> <li>There must be at least 2 members</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -441,19 +441,19 @@ define({ "api": [
       },
       "examples": [
         {
-          "title": "{",
-          "content": "{\n    name: \"Group's name\",\n    members: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"],\n    recipes: [\"7zui621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d5a\"]\n}",
+          "title": "Request example",
+          "content": "{\n    \"members\": [\n        \"5bdfe46d7c9e2801085676bf\",\n        \"5bdffb3d53618745c0bba83e\",\n        \"5bdffb8653618745c0bba83f\"\n    ]\n}",
           "type": "json"
         }
       ]
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
-            "field": "Success",
+            "field": "GroupWasUpdated",
             "description": "<p>Group was updated</p>"
           }
         ]
@@ -461,6 +461,14 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not part of that group</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
