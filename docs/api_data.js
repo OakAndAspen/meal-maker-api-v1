@@ -28,7 +28,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    userName: \"TheGreatestJoe\",\n    password: \"123456isNotASecurePassword\"\n}",
+          "content": "{\n    \"userName\": \"TheWeetchr\",\n    \"password\": \"ikillghosts4pleasure\"\n}",
           "type": "json"
         }
       ]
@@ -48,7 +48,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    token: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YmRmZTBiMmRlOTcxODQxOTAzN2RkYzYiLCJleHAiOjE1NDIwMDQxMTIuOTI4LCJpYXQiOjE1NDEzOTkzMTJ9.sxIQTddwcud-h_bDvDBCveU8co0zh_91htgOiZm7IbM\"\n}",
           "type": "json"
         }
       ]

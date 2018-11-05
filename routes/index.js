@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 /**
- * TODO: test
  * @api {post} /login Log in
  * @apiName Login
  * @apiGroup Authentication
@@ -15,18 +14,18 @@ const jwt = require('jsonwebtoken');
  * @apiParam {String}   password    Password
  *
  * @apiParamExample Request example
- * {
- *     userName: "TheGreatestJoe",
- *     password: "123456isNotASecurePassword"
- * }
+ *  {
+ *      "userName": "TheWeetchr",
+ *      "password": "ikillghosts4pleasure"
+ *  }
  *
  * @apiSuccess {String} token JWT token
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *     token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YmRmZTBiMmRlOTcxODQxOTAzN2RkYzYiLCJleHAiOjE1NDIwMDQxMTIuOTI4LCJpYXQiOjE1NDEzOTkzMTJ9.sxIQTddwcud-h_bDvDBCveU8co0zh_91htgOiZm7IbM"
+ *  }
  *
  * @apiError (400)  MissingData         The username or password is missing
  * @apiError (404)  UserNotFound        User was not found
