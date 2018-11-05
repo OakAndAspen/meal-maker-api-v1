@@ -628,9 +628,9 @@ define({ "api": [
     },
     "success": {
       "fields": {
-        "200": [
+        "204": [
           {
-            "group": "200",
+            "group": "204",
             "optional": false,
             "field": "Success",
             "description": "<p>Meal was deleted</p>"
@@ -640,6 +640,14 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not participating in the meal</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
@@ -681,76 +689,63 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "_id",
             "description": "<p>Id</p>"
           },
           {
             "group": "Success 200",
-            "type": "Date",
+            "type": "String",
+            "optional": false,
+            "field": "groupId",
+            "description": "<p>Group's id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "recipeId",
+            "description": "<p>Recipe's id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "DateTime",
             "optional": false,
             "field": "date",
             "description": "<p>Date</p>"
           },
           {
             "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "recipe",
-            "description": "<p>Recipe</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipe.id",
-            "description": "<p>Recipe'id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipe.name",
-            "description": "<p>Recipe's name</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object[]",
+            "type": "String[]",
             "optional": false,
             "field": "participants",
             "description": "<p>Participating users</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "participants.id",
-            "description": "<p>User's id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "participants.userName",
-            "description": "<p>User's name</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "{\n    id: \"5bbb621c4d7da43f508b9d5a\",\n    date: \"1995-12-17\"\n    recipe: {\n         id: \"5bbb621c4d7da43f508b9d67d\",\n         name: \"Hottest curry every conceived by mankind\"\n    },\n    participants: {\n      {id: \"5bbb61284d7da43f508b9d59\", userName: \"Kevin\"}\n      {id: \"5bbb61284d7da43f50876zu9\", userName: \"Grandma\"}\n    }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be05aa8286aae3f3491ec24\",\n    \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n    \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n    \"date\": \"2020-11-05T07:12:54.000Z\",\n    \"participants\": [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"]\n}",
           "type": "json"
         }
       ]
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not participating in the meal</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
             "optional": false,
             "field": "MealNotFound",
-            "description": "<p>Meal with id {id} was not found.</p>"
+            "description": "<p>Meal was not found</p>"
           }
         ]
       }
@@ -893,7 +888,21 @@ define({ "api": [
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not participating in the meal</p>"
+          }
+        ],
         "404": [
+          {
+            "group": "404",
+            "optional": false,
+            "field": "MealNotFound",
+            "description": "<p>Meal was not found</p>"
+          },
           {
             "group": "404",
             "optional": false,

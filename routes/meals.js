@@ -99,37 +99,31 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get} /meals/:id Show
- * @apiName GetMeal
- * @apiGroup Meal
+ * @api {get}   /meals/:id  Show
+ * @apiName     GetMeal
+ * @apiGroup    Meal
  * @apiDescription Request a meal's info
  *
- * @apiParam {String} id    Meal's id
+ * @apiParam    {String}    id              Meal's id
  *
- * @apiSuccess {String}     id                      Id
- * @apiSuccess {Date}       date                    Date
- * @apiSuccess {Object}     recipe                  Recipe
- * @apiSuccess {String}     recipe.id               Recipe'id
- * @apiSuccess {String}     recipe.name             Recipe's name
- * @apiSuccess {Object[]}   participants            Participating users
- * @apiSuccess {String}     participants.id         User's id
- * @apiSuccess {String}     participants.userName   User's name
+ * @apiSuccess  {String}    _id             Id
+ * @apiSuccess  {String}    groupId         Group's id
+ * @apiSuccess  {String}    recipeId        Recipe's id
+ * @apiSuccess  {DateTime}  date            Date
+ * @apiSuccess  {String[]}  participants    Participating users
  *
  * @apiSuccessExample Response example
+ * HTTP/1.1 200 OK
  * {
- *     id: "5bbb621c4d7da43f508b9d5a",
- *     date: "1995-12-17"
- *     recipe: {
- *          id: "5bbb621c4d7da43f508b9d67d",
- *          name: "Hottest curry every conceived by mankind"
- *     },
- *     participants: {
- *       {id: "5bbb61284d7da43f508b9d59", userName: "Kevin"}
- *       {id: "5bbb61284d7da43f50876zu9", userName: "Grandma"}
- *     }
+ *     "_id": "5be05aa8286aae3f3491ec24",
+ *     "groupId": "5bbb621c4d7da43f508b9d5a",
+ *     "recipeId": "7ddd897c4d7da43f508b9d5a",
+ *     "date": "2020-11-05T07:12:54.000Z",
+ *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"]
  * }
  *
- * @apiError (404)  MealNotFound   Meal with id {id} was not found.
+ * @apiError (404)  MealNotFound    Meal was not found
+ * @apiError (403)  NotAllowed      Authenticated user is not participating in the meal
  */
 router.get('/:id', findMealById, (req, res, next) => {
     return res.status(200).send(req.meal);
@@ -187,6 +181,8 @@ router.get('/', (req, res, next) => {
  *
  * @apiSuccess (200)    Success     Meal was updated
  *
+ * @apiError (404)  MealNotFound    Meal was not found
+ * @apiError (403)  NotAllowed      Authenticated user is not participating in the meal
  * @apiError (404)  UserNotFound    User was not found
  * @apiError (404)  RecipeNotFound  Recipe was not found
  */
@@ -204,14 +200,15 @@ router.patch('/:id', findMealById, (req, res, next) => {
  * @apiGroup Meal
  * @apiDescription Delete a meal
  *
- * @apiParam {String} id    Meal's id
+ * @apiParam {String}   id              Meal's id
  *
- * @apiSuccess (200)    Success     Meal was deleted
+ * @apiSuccess  (204)   Success         Meal was deleted
  *
- * @apiError (404)  MealNotFound   Meal was not found
+ * @apiError    (404)   MealNotFound    Meal was not found
+ * @apiError    (403)   NotAllowed      Authenticated user is not participating in the meal
  */
 router.delete('/:id', findMealById, (req, res, next) => {
-    req.meal.remove(function (err) {
+    req.meal.remove((err) => {
         if (err) return next(err);
         return res.sendStatus(204);
     });
@@ -221,9 +218,12 @@ router.delete('/:id', findMealById, (req, res, next) => {
 function findMealById(req, res, next) {
     Meal.findById(req.params.id).exec(function (err, meal) {
         if (err) return next(err);
-        else if (!meal) return res.status(404).send({
-            error: 'No meal found with ID ' + req.params.id
-        });
+        // Checking if meal exists
+        if (!meal) return res.status(404).send('GroupNotFound');
+        // Checking if current user is participating in that meal
+        if (!meal.participants.includes(req.userId)) {
+            return res.status(403).send('NotAllowed');
+        }
         req.meal = meal;
         next();
     });
