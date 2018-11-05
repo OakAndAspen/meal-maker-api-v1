@@ -270,17 +270,10 @@
             "type": "String",
             "optional": false,
             "field": "id",
-            "description": "<p>Group id</p>"
+            "description": "<p>Id</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "Request example",
-          "content": "{\n   id: \"7cd5621c4d7da43f508b9d5a\"\n}",
-          "type": "json"
-        }
-      ]
+      }
     },
     "success": {
       "fields": {
@@ -289,7 +282,7 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "id",
+            "field": "_id",
             "description": "<p>Id</p>"
           },
           {
@@ -301,58 +294,38 @@
           },
           {
             "group": "Success 200",
-            "type": "Object[]",
+            "type": "String[]",
             "optional": false,
             "field": "recipes",
             "description": "<p>Recipes</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipes.id",
-            "description": "<p>Recipe's id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "recipes.name",
-            "description": "<p>Recipe's name</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object[]",
+            "type": "String[]",
             "optional": false,
             "field": "members",
             "description": "<p>Participating users</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "members.id",
-            "description": "<p>User's id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "members.name",
-            "description": "<p>User's name</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n    id: \"7zui621c4d7da43f508b9d5a\",\n    name: \"The group of awesome\",\n    recipes: [\n      {id: \"7zui621c4d7da43f508b9d5a\", name: \"Some recipe\"},\n      {id: \"7zui621c4d7da43f508b9d4d\", name: \"Some other recipe\"}\n    ],\n    members: [\n      {id: \"5ccc621c4d7da43f508b9d5a\", name: \"Dad\"}\n      {id: \"5ccc621c4d7da43f508b6f8g\", name: \"Mom\"}\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be00126b1dd7244940b9c6d\",\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\"5bdffb8653618745c0bba83f\",\"5bdffb3d53618745c0bba83e\"],\n    \"recipes\": [\"6adffb8653618745c0bba83f\"]\n}",
           "type": "json"
         }
       ]
     },
     "error": {
       "fields": {
+        "403": [
+          {
+            "group": "403",
+            "optional": false,
+            "field": "NotAllowed",
+            "description": "<p>Authenticated user is not part of that group</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",

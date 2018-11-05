@@ -71,47 +71,33 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * @api {get} /groups/:id Show
- * @apiName GetGroup
- * @apiGroup Group
+ * @api {get}   /groups/:id Show
+ * @apiName     GetGroup
+ * @apiGroup    Group
  * @apiDescription Request a group's info
  * - The authenticated user must be part of that group
  *
- * @apiParam {String} id Group id
+ * @apiParam    {String}    id              Id
  *
- * @apiParamExample Request example
- * {
- *    id: "7cd5621c4d7da43f508b9d5a"
- * }
- *
- * @apiSuccess {String}     id              Id
+ * @apiSuccess {String}     _id              Id
  * @apiSuccess {String}     name            Name
- * @apiSuccess {Object[]}   recipes         Recipes
- * @apiSuccess {String}     recipes.id      Recipe's id
- * @apiSuccess {String}     recipes.name    Recipe's name
- * @apiSuccess {Object[]}   members         Participating users
- * @apiSuccess {String}     members.id      User's id
- * @apiSuccess {String}     members.name    User's name
+ * @apiSuccess {String[]}   recipes         Recipes
+ * @apiSuccess {String[]}   members         Participating users
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *     id: "7zui621c4d7da43f508b9d5a",
- *     name: "The group of awesome",
- *     recipes: [
- *       {id: "7zui621c4d7da43f508b9d5a", name: "Some recipe"},
- *       {id: "7zui621c4d7da43f508b9d4d", name: "Some other recipe"}
- *     ],
- *     members: [
- *       {id: "5ccc621c4d7da43f508b9d5a", name: "Dad"}
- *       {id: "5ccc621c4d7da43f508b6f8g", name: "Mom"}
- *     ]
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5be00126b1dd7244940b9c6d",
+ *      "name": "RedBaronCastle",
+ *      "members": ["5bdffb8653618745c0bba83f","5bdffb3d53618745c0bba83e"],
+ *      "recipes": ["6adffb8653618745c0bba83f"]
+ *  }
  *
  * @apiError (404)  GroupNotFound   Group was not found
+ * @apiError (403)  NotAllowed      Authenticated user is not part of that group
  */
 router.get('/:id', getGroup, (req, res) => {
-    return res.send(req.group);
+    return res.status(200).send(req.group);
 });
 
 /**
@@ -148,7 +134,7 @@ router.get('/:id', getGroup, (req, res) => {
 router.get('/', (req, res, next) => {
     Group.find({members: req.userId}).sort('name').exec((err, groups) => {
         if (err) return next(err);
-        res.status(200).send({'groups': groups});
+        return res.status(200).send({'groups': groups});
     });
 });
 
@@ -235,7 +221,6 @@ router.patch('/:id', getGroup, (req, res, next) => {
  * @apiError    (403)   NotAllowed      Authenticated user if not part of that group
  */
 router.delete('/:id', getGroup, (req, res, next) => {
-    if (!req.group.members.includes(req.userId)) return res.status(403).send('NotAllowed');
     req.group.remove(function (err) {
         if (err) return next(err);
         return res.status(204).send('GroupWasDeleted');
@@ -249,7 +234,7 @@ function getGroup(req, res, next) {
         // Checking if group exists
         if (!group) return res.status(404).send('GroupNotFound');
         // Checking if current user is a member of that group
-        if (!group.members.includes(req.userId)) return res.sendStatus(403);
+        if (!group.members.includes(req.userId)) return res.status(403).send('NotAllowed');
         req.group = group;
         next();
     });
