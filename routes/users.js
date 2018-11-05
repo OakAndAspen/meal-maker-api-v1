@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const Recipe = require('../models/recipe');
 const bcrypt = require('bcrypt');
 
 /**
- * TODO: aggregate of rated recipes
  * @api         {get}   /users/:id  Show
  * @apiName     GetUser
  * @apiGroup    User
@@ -29,13 +29,18 @@ const bcrypt = require('bcrypt');
  * @apiError (404)  UserNotFound    User was not found.
  */
 router.get('/:id', findUserById, (req, res, next) => {
-    return res.status(200).send(req.user);
+    let userId = req.user._id;
+    Recipe.aggregate([{$match: {'ratings.userId': userId}}], (err, results) => {
+        if(err) return next(err);
+        return res.send(results);
+        return res.status(200).send(req.user);
+    });
 });
 
 /**
- * @api {get} /users Index
- * @apiName GetUsers
- * @apiGroup User
+ * @api {get}   /users Index
+ * @apiName     GetUsers
+ * @apiGroup    User
  * @apiDescription Request a list of users
  *
  * @apiSuccess {Object[]}   users               List of users

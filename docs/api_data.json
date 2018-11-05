@@ -761,55 +761,49 @@
     "name": "GetMeals",
     "group": "Meal",
     "description": "<p>Request a list of meals the authenticated user participates in</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Meal's id</p>"
-          }
-        ]
-      }
-    },
     "success": {
       "fields": {
         "Success 200": [
           {
             "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "meals",
+            "description": "<p>List of meals</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "_id",
+            "field": "meals._id",
             "description": "<p>Id</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "groupId",
+            "field": "meals.groupId",
             "description": "<p>Group's id</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "recipeId",
+            "field": "meals.recipeId",
             "description": "<p>Recipe's id</p>"
           },
           {
             "group": "Success 200",
             "type": "DateTime",
             "optional": false,
-            "field": "date",
+            "field": "meals.date",
             "description": "<p>Date</p>"
           },
           {
             "group": "Success 200",
             "type": "String[]",
             "optional": false,
-            "field": "participants",
+            "field": "meals.participants",
             "description": "<p>Participating users</p>"
           }
         ]
@@ -817,7 +811,7 @@
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n {\n     [\n         {\n             \"_id\": \"5be05aa8286aae3f3491ec24\",\n             \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n              \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n             \"date\": \"2020-11-05T07:12:54.000Z\",\n             \"participants\": [\"5bdffb8653618745c0bba83f\", \"5bbb61284d7da43f508b9d59\"]\n         },\n         {\n             \"_id\": \"5be060bbfcd6c3145cb42fa0\",\n             \"groupId\": \"5be00126b1dd7244940b9c6d\",\n             \"recipeId\": \"5be01dddca9c3f4e801310c9\",\n             \"date\": \"2020-12-05T07:12:54.000Z\",\n             \"participants\": [\"5bdffb8653618745c0bba83f\",\"5bdffb3d53618745c0bba83e\"]\n         }\n    ]\n }",
+          "content": "HTTP/1.1 200 OK\n{\n    \"meals\": [\n        {\n            \"_id\": \"5be05aa8286aae3f3491ec24\",\n            \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n             \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n            \"date\": \"2020-11-05T07:12:54.000Z\",\n            \"participants\": [\"5bdffb8653618745c0bba83f\", \"5bbb61284d7da43f508b9d59\"]\n        },\n        {\n            \"_id\": \"5be060bbfcd6c3145cb42fa0\",\n            \"groupId\": \"5be00126b1dd7244940b9c6d\",\n            \"recipeId\": \"5be01dddca9c3f4e801310c9\",\n            \"date\": \"2020-12-05T07:12:54.000Z\",\n            \"participants\": [\"5bdffb8653618745c0bba83f\",\"5bdffb3d53618745c0bba83e\"]\n        }\n    ]\n}",
           "type": "json"
         }
       ]
@@ -1464,20 +1458,20 @@
           {
             "group": "Parameter",
             "type": "Number",
-            "optional": false,
+            "optional": true,
             "field": "page",
             "description": "<p>The current page, showing max. 5 results</p>"
           }
         ]
-      },
-      "examples": [
-        {
-          "title": "Request example",
-          "content": "{\n     page: 2\n}",
-          "type": "json"
-        }
-      ]
+      }
     },
+    "examples": [
+      {
+        "title": "URL example",
+        "content": "/recipes?page=3",
+        "type": "json"
+      }
+    ],
     "success": {
       "fields": {
         "Success 200": [

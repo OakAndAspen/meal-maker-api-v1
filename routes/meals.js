@@ -135,18 +135,17 @@ router.get('/:id', findMealById, (req, res, next) => {
  * @apiGroup    Meal
  * @apiDescription Request a list of meals the authenticated user participates in
  *
- * @apiParam    {String}    id              Meal's id
- *
- * @apiSuccess  {String}    _id             Id
- * @apiSuccess  {String}    groupId         Group's id
- * @apiSuccess  {String}    recipeId        Recipe's id
- * @apiSuccess  {DateTime}  date            Date
- * @apiSuccess  {String[]}  participants    Participating users
+ * @apiSuccess  {Object[]}  meals               List of meals
+ * @apiSuccess  {String}    meals._id           Id
+ * @apiSuccess  {String}    meals.groupId       Group's id
+ * @apiSuccess  {String}    meals.recipeId      Recipe's id
+ * @apiSuccess  {DateTime}  meals.date          Date
+ * @apiSuccess  {String[]}  meals.participants  Participating users
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
+ *  HTTP/1.1 200 OK
  *  {
- *      [
+ *      "meals": [
  *          {
  *              "_id": "5be05aa8286aae3f3491ec24",
  *              "groupId": "5bbb621c4d7da43f508b9d5a",
@@ -161,7 +160,7 @@ router.get('/:id', findMealById, (req, res, next) => {
  *              "date": "2020-12-05T07:12:54.000Z",
  *              "participants": ["5bdffb8653618745c0bba83f","5bdffb3d53618745c0bba83e"]
  *          }
- *     ]
+ *      ]
  *  }
  */
 router.get('/', (req, res, next) => {

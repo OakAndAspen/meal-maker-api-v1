@@ -120,12 +120,10 @@ router.get('/:id', findRecipeById, (req, res, next) => {
  * @apiGroup    Recipe
  * @apiDescription Request a list of recipes, paginated, with a max. of 5 recipes per page
  *
- * @apiParam {Number}   page        The current page, showing max. 5 results
+ * @apiParam {Number}   [page]  The current page, showing max. 5 results
  *
- * @apiParamExample Request example
- * {
- *      page: 2
- * }
+ * @apiExample URL example
+ *  /recipes?page=3
  *
  * @apiSuccess {Object[]}   recipes                 List of recipes
  * @apiSuccess {String}     recipes._id             Id
@@ -166,7 +164,8 @@ router.get('/:id', findRecipeById, (req, res, next) => {
  *
  */
 router.get('/', (req, res, next) => {
-    Recipe.find({}).exec((err, recipes) => {
+    let page = req.query.page || 1;
+    Recipe.find({}).skip((page - 1) * 5).limit(5).exec((err, recipes) => {
         if (err) return next(err);
         return res.status(200).send({recipes: recipes});
     });
