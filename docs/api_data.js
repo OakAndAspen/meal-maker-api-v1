@@ -869,25 +869,75 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "{\n    recipeId: \"7ddd897c4d7da43f508b9d5a\",\n    date: \"2018-11-21 19:00:00\",\n    participants: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\", \"5bd7083ed584b00d1c768f2e\"]\n}",
+          "content": "{\n    \"date\": \"2020-08-05T07:12:54\"\n}",
           "type": "json"
         }
       ]
     },
     "success": {
       "fields": {
-        "200": [
+        "201": [
           {
-            "group": "200",
+            "group": "201",
+            "type": "String",
             "optional": false,
-            "field": "Success",
-            "description": "<p>Meal was updated</p>"
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "groupId",
+            "description": "<p>Group's id</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "recipeId",
+            "description": "<p>Recipe's id</p>"
+          },
+          {
+            "group": "201",
+            "type": "DateTime",
+            "optional": false,
+            "field": "date",
+            "description": "<p>Date</p>"
+          },
+          {
+            "group": "201",
+            "type": "String[]",
+            "optional": false,
+            "field": "participants",
+            "description": "<p>Participating users</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Response example",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be05aa8286aae3f3491ec24\",\n    \"groupId\": \"5bbb621c4d7da43f508b9d5a\",\n    \"recipeId\": \"7ddd897c4d7da43f508b9d5a\",\n    \"date\": \"2020-08-05T07:12:54.000Z\",\n    \"participants\": [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"]\n}",
+          "type": "json"
+        }
+      ]
     },
     "error": {
       "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "DateInvalid",
+            "description": "<p>Date is invalid</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "ParticipantsInvalid",
+            "description": "<p>Participants are not all members of this group</p>"
+          }
+        ],
         "403": [
           {
             "group": "403",
