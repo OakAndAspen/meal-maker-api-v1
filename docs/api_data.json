@@ -1394,17 +1394,10 @@
     "title": "Create",
     "name": "PostRecipe",
     "group": "Recipe",
-    "description": "<p>Create a new recipe</p>",
+    "description": "<p>Create a new recipe</p> <ul> <li>The authenticated user will be used as author</li> <li>The name must be at least 3 characters long</li> <li>The servings amount must be at least 1</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "authorId",
-            "description": "<p>Author's id</p>"
-          },
           {
             "group": "Parameter",
             "type": "String",
@@ -1423,15 +1416,22 @@
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "imgUrl",
+            "field": "imageUrl",
             "description": "<p>Image URL</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "servings",
+            "description": "<p>Servings amount</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    authorId: \"5bbb621c4d7da43f508b9d5a\",\n    name: \"Fancy recipe\",\n    description: \"This will be good... probably\",\n    imgUrl: \"//cdn.myapp.net/img/jhsdfo4837f.jpg\"\n}",
+          "content": "{\n    \"name\": \"Werewolf soup\",\n    \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n    \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n    \"servings\": 4\n}",
           "type": "json"
         }
       ]
@@ -1441,10 +1441,17 @@
         "201": [
           {
             "group": "201",
-            "type": "Number",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>Id</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
             "optional": false,
             "field": "authorId",
-            "description": "<p>Author's id</p>"
+            "description": "<p>Author user's id</p>"
           },
           {
             "group": "201",
@@ -1464,39 +1471,82 @@
             "group": "201",
             "type": "String",
             "optional": false,
-            "field": "imgUrl",
+            "field": "imageUrl",
             "description": "<p>Image URL</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "servings",
+            "description": "<p>Servings</p>"
+          },
+          {
+            "group": "201",
+            "type": "Object[]",
+            "optional": false,
+            "field": "ratings",
+            "description": "<p>Users ratings of this recipe</p>"
+          },
+          {
+            "group": "201",
+            "type": "String",
+            "optional": false,
+            "field": "ratings.userId",
+            "description": "<p>Rating's user's is</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.health",
+            "description": "<p>Health rating</p>"
+          },
+          {
+            "group": "201",
+            "type": "Number",
+            "optional": false,
+            "field": "ratings.taste",
+            "description": "<p>Taste rating</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n\n    authorId: \"5bbb621c4d7da43f508b9d5a\",\n    name: \"Fancy recipe\",\n    description: \"This will be good... probably\",\n    imgUrl: \"https://cdn.myapp.net/img/jhsdfo4837f.jpg\"\n}",
+          "content": "HTTP/1.1 201 OK\n{\n    \"_id\": \"5be01b75570f034068fc97af\",\n    \"authorId\": \"5bdffb3d53618745c0bba83e\",\n    \"name\": \"Werewolf soup\",\n    \"description\": \"A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.\",\n    \"imageUrl\": \"//cdn.myapp.net/img/jhsdfo4837f.jpg\",\n    \"servings\": 4,\n    \"ratings\": [],\n}",
           "type": "json"
         }
       ]
     },
     "error": {
       "fields": {
+        "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>One of the mandatory parameters is missing</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "NameTooShort",
+            "description": "<p>Name is too short</p>"
+          },
+          {
+            "group": "400",
+            "optional": false,
+            "field": "ServingsInvalid",
+            "description": "<p>The servings amount is not valid</p>"
+          }
+        ],
         "404": [
           {
             "group": "404",
             "optional": false,
             "field": "UserNotFound",
             "description": "<p>User was not found</p>"
-          },
-          {
-            "group": "404",
-            "optional": false,
-            "field": "NameTooShort",
-            "description": "<p>Name is too short</p>"
-          },
-          {
-            "group": "404",
-            "optional": false,
-            "field": "DescriptionTooShort",
-            "description": "<p>Description is too short</p>"
           }
         ]
       }

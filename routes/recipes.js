@@ -4,60 +4,71 @@ const Recipe = require('../models/recipe');
 const Group = require('../models/group');
 
 /**
- * @api {post} /recipes Create
- * @apiName PostRecipe
- * @apiGroup Recipe
+ * @api {post}  /recipes Create
+ * @apiName     PostRecipe
+ * @apiGroup    Recipe
  * @apiDescription Create a new recipe
+ * - The authenticated user will be used as author
+ * - The name must be at least 3 characters long
+ * - The servings amount must be >= 1
  *
- * @apiParam {String}   authorId    Author's id
  * @apiParam {String}   name        Name
  * @apiParam {String}   description Description
- * @apiParam {String}   imgUrl      Image URL
+ * @apiParam {String}   imageUrl    Image URL
+ * @apiParam {Number}   servings    Servings amount
  *
  * @apiParamExample Request example
  * {
- *     authorId: "5bbb621c4d7da43f508b9d5a",
- *     name: "Fancy recipe",
- *     description: "This will be good... probably",
- *     imgUrl: "//cdn.myapp.net/img/jhsdfo4837f.jpg"
+ *     "name": "Werewolf soup",
+ *     "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *     "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *     "servings": 4
  * }
  *
- * @apiSuccess (201) {Number}   authorId    Author's id
- * @apiSuccess (201) {String}   name        Name
- * @apiSuccess (201) {String}   description Description
- * @apiSuccess (201) {String}   imgUrl      Image URL
+ * @apiSuccess (201) {String}   _id             Id
+ * @apiSuccess (201) {String}   authorId        Author user's id
+ * @apiSuccess (201) {String}   name            Name
+ * @apiSuccess (201) {String}   description     Description
+ * @apiSuccess (201) {String}   imageUrl        Image URL
+ * @apiSuccess (201) {Number}   servings        Servings
+ * @apiSuccess (201) {Object[]} ratings         Users ratings of this recipe
+ * @apiSuccess (201) {String}   ratings.userId  Rating's user's is
+ * @apiSuccess (201) {Number}   ratings.health  Health rating
+ * @apiSuccess (201) {Number}   ratings.taste   Taste rating
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *
- *     authorId: "5bbb621c4d7da43f508b9d5a",
- *     name: "Fancy recipe",
- *     description: "This will be good... probably",
- *     imgUrl: "https://cdn.myapp.net/img/jhsdfo4837f.jpg"
- * }
+ *  HTTP/1.1 201 OK
+ *  {
+ *      "_id": "5be01b75570f034068fc97af",
+ *      "authorId": "5bdffb3d53618745c0bba83e",
+ *      "name": "Werewolf soup",
+ *      "description": "A witcher delicacy! Juste take the eyes and paws of your freshly killed werewolf and boil them in orange juice.",
+ *      "imageUrl": "//cdn.myapp.net/img/jhsdfo4837f.jpg",
+ *      "servings": 4,
+ *      "ratings": [],
+ *  }
  *
  * @apiError (404)  UserNotFound        User was not found
- * @apiError (404)  NameTooShort        Name is too short
- * @apiError (404)  DescriptionTooShort Description is too short
+ * @apiError (400)  MissingData         One of the mandatory parameters is missing
+ * @apiError (400)  NameTooShort        Name is too short
+ * @apiError (400)  ServingsInvalid     The servings amount is not valid
  */
 router.post('/', (req, res, next) => {
-    let name = req.body.name;
-    let description = req.body.description;
-    let imageUrl = req.body.imageUrl;
-    let servings = req.body.servings;
+    let name = req.body.name || null;
+    let description = req.body.description || null;
+    let imageUrl = req.body.imageUrl || null;
+    let servings = req.body.servings || null;
 
-    if (!name || name.length < 3) return res.status(400).send('NameTooShort');
-    if (!description) return res.status(400).send('NoDescription');
-    if (!imageUrl) return res.status(400).send('NoImageUrl');
-    if (!servings || servings < 1) return res.status(400).send('ServingsInvalid');
+    if(!name || !description || !imageUrl || !servings) return res.status(400).send('MissingData');
+    if (name.length < 3) return res.status(400).send('NameTooShort');
+    if (isNaN(servings) || servings < 1) return res.status(400).send('ServingsInvalid');
 
     let newRecipe = new Recipe({
         authorId: req.userId,
         name: name,
         description: description,
         imageUrl: imageUrl,
-        servings: req.servings
+        servings: servings
     });
 
     newRecipe.save((err, recipe) => {
