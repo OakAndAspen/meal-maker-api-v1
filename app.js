@@ -53,15 +53,15 @@ app.use(function (err, req, res, next) {
 function authenticate (req, res, next) {
     // Check the header
     const authorization = req.get('Authorization');
-    if (!authorization) return res.status(403).send({error: 'NoAuthHeader'});
+    if (!authorization) return res.status(401).send('NoAuthHeader');
     const match = authorization.match(/^Bearer (.+)$/);
-    if (!match) return res.status(403).send({error: 'WrongAuthHeader'});
+    if (!match) return res.status(401).send('WrongAuthHeader');
 
     // Verify token
     const token = match[1];
     const secretKey = process.env.SECRET_KEY || 'changeme';
     jwt.verify(token, secretKey, function (err, payload) {
-        if (err) return res.status(403).send({error: 'TokenInvalid'});
+        if (err) return res.status(401).send('TokenInvalid');
         req.userId = payload.sub;
         next();
     });

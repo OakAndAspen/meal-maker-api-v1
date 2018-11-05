@@ -5,21 +5,25 @@ const User = require('../models/user');
 const Recipe = require('../models/recipe');
 
 /**
- * @api {post} /groups Create
- * @apiName PostGroup
- * @apiGroup Group
- * @apiDescription Create a new group
+ * @api {post}  /groups     Create
+ * @apiName     PostGroup
+ * @apiGroup    Group
+ * @apiDescription          Create a new group
  * - The name must be at least 3 characters long
  * - There must be at least 2 members
+ * - If the authenticated user is not listed in the members, it is automatically added
  *
  * @apiParam {String}   name    Group name
  * @apiParam {String[]} members Participating users' ids
  *
  * @apiParamExample Request example
- * {
- *     name: "Stanton family"
- *     members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59", "5bd7083ed584b00d1c768f2e"]
- * }
+ *  {
+ *      "name": "RedBaronCastle",
+ *      "members": [
+ *          "5bdffb8653618745c0bba83f",
+ *          "5bdffb3d53618745c0bba83e"
+ *      ]
+ *  }
  *
  * @apiSuccess (201) {String}   _id         Id
  * @apiSuccess (201) {String}   name        Name
@@ -27,31 +31,39 @@ const Recipe = require('../models/recipe');
  * @apiSuccess (201) {String[]} recipes     Recipes ids
  *
  * @apiSuccessExample Response example
- * HTTP/1.1 200 OK
- * {
- *      _id: "1284d7d5bbb6a43f508b9d59",
- *      name: "Stanton family",
- *      members: ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"],
- *      recipes: []
- * }
+ *  HTTP/1.1 200 OK
+ *  {
+ *      "_id": "5be00086ba644a266c20906e",
+ *      "name": "RedBaronCastle",
+ *      "members": [
+ *          "5bdffb8653618745c0bba83f",
+ *          "5bdffb3d53618745c0bba83e"
+*       ],
+ *      "recipes": []
+ *  }
  *
  * @apiError (404)  UserNotFound        User was not found
+ * @apiError (400)  MissingData         One of the mandatory parameters is missing
  * @apiError (400)  NameTooShort        Name is too short
  * @apiError (400)  NotEnoughMembers    Not enough members in the group
  */
 router.post('/', (req, res, next) => {
-    let name = req.body.name;
-    let membersIds = req.body.members;
+    let name = req.body.name || null;
+    let members = req.body.members || null;
 
-    if (!name || name.length < 3) return res.status(400).send('NameTooShort');
-    if (!membersIds.includes(req.userId)) membersIds.push(req.userId);
-    if (!membersIds || membersIds.length < 2) return res.status(400).send('NotEnoughMembers');
+    if(!name || !members) return res.status(400).send('MissingData');
+    if (name.length < 3) return res.status(400).send('NameTooShort');
 
-    User.where('_id').in(membersIds).find((err, members) => {
+    // Check members
+    if (!members.includes(req.userId)) members.push(req.userId);
+    members = members.filter((m, i) => members.indexOf(m) === i);
+    if (members.length < 2) return res.status(400).send('NotEnoughMembers');
+
+    User.where('_id').in(members).find((err, existingMembers) => {
         if (err) return next(err);
-        if (members.length !== membersIds.length) return res.status(404).send('UserNotFound');
+        if (existingMembers.length !== members.length) return res.status(404).send('UserNotFound');
 
-        new Group({name: name, members: membersIds}).save((err, group) => {
+        new Group({name: name, members: members}).save((err, group) => {
             if (err) return next(err);
             return res.status(201).send(group);
         });
@@ -117,18 +129,18 @@ router.get('/:id', getGroup, (req, res) => {
  * @apiSuccessExample Response example
  * HTTP/1.1 200 OK
  * {
- *      groups: [
+ *      "groups": [
  *          {
- *              id: "7zui621c4d7da43f508b9d5a",
- *              name: "The group of awesome",
- *              recipes: ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
- *              members: ["5ccc621c4d7da43f508b9d5a", "5ccc621c4d7da43f508b6f8g"]
+ *              "id": "7zui621c4d7da43f508b9d5a",
+ *              "name": "The group of awesome",
+ *              "recipes": ["7zui621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
+ *              "members": ["5ccc621c4d7da43f508b9d5a", "5ccc621c4d7da43f508b6f8g"]
  *          },
  *          {
- *              id: "da43f508b9d5a5ccc621c4d7",
- *              name: "The best group",
- *              recipes: ["5ccc621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
- *              members: ["7zui621c4d7da43f508b9d4d", "5ccc621c4d7da43f508b6f8g"]
+ *              "id: "da43f508b9d5a5ccc621c4d7",
+ *              "name": "The best group",
+ *              "recipes": ["5ccc621c4d7da43f508b9d5a", "7zui621c4d7da43f508b9d4d"],
+ *              "members": ["7zui621c4d7da43f508b9d4d", "5ccc621c4d7da43f508b6f8g"]
  *          }
  *      ]
  * }

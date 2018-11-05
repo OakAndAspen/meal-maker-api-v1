@@ -409,7 +409,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n     groups: [\n         {\n             id: \"7zui621c4d7da43f508b9d5a\",\n             name: \"The group of awesome\",\n             recipes: [\"7zui621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             members: [\"5ccc621c4d7da43f508b9d5a\", \"5ccc621c4d7da43f508b6f8g\"]\n         },\n         {\n             id: \"da43f508b9d5a5ccc621c4d7\",\n             name: \"The best group\",\n             recipes: [\"5ccc621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             members: [\"7zui621c4d7da43f508b9d4d\", \"5ccc621c4d7da43f508b6f8g\"]\n         }\n     ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n     \"groups\": [\n         {\n             \"id\": \"7zui621c4d7da43f508b9d5a\",\n             \"name\": \"The group of awesome\",\n             \"recipes\": [\"7zui621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             \"members\": [\"5ccc621c4d7da43f508b9d5a\", \"5ccc621c4d7da43f508b6f8g\"]\n         },\n         {\n             \"id: \"da43f508b9d5a5ccc621c4d7\",\n             \"name\": \"The best group\",\n             \"recipes\": [\"5ccc621c4d7da43f508b9d5a\", \"7zui621c4d7da43f508b9d4d\"],\n             \"members\": [\"7zui621c4d7da43f508b9d4d\", \"5ccc621c4d7da43f508b6f8g\"]\n         }\n     ]\n}",
           "type": "json"
         }
       ]
@@ -512,7 +512,7 @@ define({ "api": [
     "title": "Create",
     "name": "PostGroup",
     "group": "Group",
-    "description": "<p>Create a new group</p> <ul> <li>The name must be at least 3 characters long</li> <li>There must be at least 2 members</li> </ul>",
+    "description": "<p>Create a new group</p> <ul> <li>The name must be at least 3 characters long</li> <li>There must be at least 2 members</li> <li>If the authenticated user is not listed in the members, it is automatically added</li> </ul>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -535,7 +535,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Request example",
-          "content": "{\n    name: \"Stanton family\"\n    members: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\", \"5bd7083ed584b00d1c768f2e\"]\n}",
+          "content": "{\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\n        \"5bdffb8653618745c0bba83f\",\n        \"5bdffb3d53618745c0bba83e\"\n    ]\n}",
           "type": "json"
         }
       ]
@@ -576,7 +576,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Response example",
-          "content": "HTTP/1.1 200 OK\n{\n     _id: \"1284d7d5bbb6a43f508b9d59\",\n     name: \"Stanton family\",\n     members: [\"5bbb621c4d7da43f508b9d5a\", \"5bbb61284d7da43f508b9d59\"],\n     recipes: []\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    \"_id\": \"5be00086ba644a266c20906e\",\n    \"name\": \"RedBaronCastle\",\n    \"members\": [\n        \"5bdffb8653618745c0bba83f\",\n        \"5bdffb3d53618745c0bba83e\"\n     ],\n    \"recipes\": []\n}",
           "type": "json"
         }
       ]
@@ -584,6 +584,12 @@ define({ "api": [
     "error": {
       "fields": {
         "400": [
+          {
+            "group": "400",
+            "optional": false,
+            "field": "MissingData",
+            "description": "<p>One of the mandatory parameters is missing</p>"
+          },
           {
             "group": "400",
             "optional": false,
