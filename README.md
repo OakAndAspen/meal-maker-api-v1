@@ -6,3 +6,7 @@ http://meal-maker-api-doc.oakandaspen.ch
 
 The app is available here:
 https://comem-webserv-2018-2019-f.herokuapp.com/users
+
+To link to a heroku server:
+
+`heroku git:remote -a comem-webserv-2018-2019-f`
