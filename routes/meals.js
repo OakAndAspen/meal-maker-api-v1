@@ -16,6 +16,9 @@ const Recipe = require('../models/recipe');
  * @apiParam {String}   recipeId        Recipe's id
  * @apiParam {DateTime} date            Date
  * @apiParam {String[]} participants    Participating users
+ * @apiParam {Object}   location        Location of the meal
+ * @apiParam {Number}   location.x      x coordinate
+ * @apiParam {Number}   location.y      y coordinate
  *
  * @apiParamExample Request example
  * {
@@ -23,6 +26,10 @@ const Recipe = require('../models/recipe');
  *     "recipeId": "7ddd897c4d7da43f508b9d5a",
  *     "date": "2020-11-05T08:12:54",
  *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"]
+ *     "location": {
+ *          "x": 6.8394017,
+ *          "y": 46.464769
+ *      }
  * }
  *
  * @apiSuccess (201) {String}   _id             Id
@@ -30,6 +37,9 @@ const Recipe = require('../models/recipe');
  * @apiSuccess (201) {String}   recipeId        Recipe's id
  * @apiSuccess (201) {DateTime} date            Date
  * @apiSuccess (201) {String[]} participants    Participating users
+ * @apiSuccess (201) {Object}   location        Location of the meal
+ * @apiSuccess (201) {Number}   location.x      x coordinate
+ * @apiSuccess (201) {Number}   location.y      y coordinate
  *
  * @apiSuccessExample Response example
  * HTTP/1.1 201 Created
@@ -39,6 +49,10 @@ const Recipe = require('../models/recipe');
  *     "recipeId": "7ddd897c4d7da43f508b9d5a",
  *     "date": "2020-11-05T07:12:54.000Z",
  *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"]
+ *     "location": {
+ *          "x": 6.8394017,
+ *          "y": 46.464769
+ *      }
  * }
  *
  * @apiError (404)  UserNotFound            User was not found
@@ -52,6 +66,7 @@ router.post('/', (req, res, next) => {
     let recipeId = req.body.recipeId || null;
     let date = req.body.date || null;
     let participants = req.body.participants || null;
+    let location = req.body.location || null;
 
     if (!groupId || !recipeId || !date || !participants || !participants.length) {
         return res.status(400).send('MissingData');
@@ -90,6 +105,9 @@ router.post('/', (req, res, next) => {
         });
     });
 
+    // Assign the location
+    meal.location = location;
+
     Promise.all([checkGroup, checkRecipe]).then(() => {
         meal.save((err, savedMeal) => {
             if (err) return next(err);
@@ -111,6 +129,9 @@ router.post('/', (req, res, next) => {
  * @apiSuccess  {String}    recipeId        Recipe's id
  * @apiSuccess  {DateTime}  date            Date
  * @apiSuccess  {String[]}  participants    Participating users
+ * @apiSuccess  {Object}    location        Location of the meal
+ * @apiSuccess  {Number}    location.x      x coordinate
+ * @apiSuccess  {Number}    location.y      y coordinate
  *
  * @apiSuccessExample Response example
  * HTTP/1.1 200 OK
@@ -120,6 +141,10 @@ router.post('/', (req, res, next) => {
  *     "recipeId": "7ddd897c4d7da43f508b9d5a",
  *     "date": "2020-11-05T07:12:54.000Z",
  *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"]
+ *     "location": {
+ *          "x": 6.8394017,
+ *          "y": 46.464769
+ *      }
  * }
  *
  * @apiError (404)  MealNotFound    Meal was not found
@@ -141,6 +166,9 @@ router.get('/:id', findMealById, (req, res) => {
  * @apiSuccess  {String}    meals.recipeId      Recipe's id
  * @apiSuccess  {DateTime}  meals.date          Date
  * @apiSuccess  {String[]}  meals.participants  Participating users
+ * @apiSuccess  {Object}    location        Location of the meal
+ * @apiSuccess  {Number}    location.x      x coordinate
+ * @apiSuccess  {Number}    location.y      y coordinate
  *
  * @apiSuccessExample Response example
  *  HTTP/1.1 200 OK
@@ -151,7 +179,11 @@ router.get('/:id', findMealById, (req, res) => {
  *              "groupId": "5bbb621c4d7da43f508b9d5a",
 *               "recipeId": "7ddd897c4d7da43f508b9d5a",
  *              "date": "2020-11-05T07:12:54.000Z",
- *              "participants": ["5bdffb8653618745c0bba83f", "5bbb61284d7da43f508b9d59"]
+ *              "participants": ["5bdffb8653618745c0bba83f", "5bbb61284d7da43f508b9d59"],
+ *              "location": {
+ *                  "x": 6.8394017,
+ *                  "y": 46.464769
+ *              }
  *          },
  *          {
  *              "_id": "5be060bbfcd6c3145cb42fa0",
@@ -159,6 +191,10 @@ router.get('/:id', findMealById, (req, res) => {
  *              "recipeId": "5be01dddca9c3f4e801310c9",
  *              "date": "2020-12-05T07:12:54.000Z",
  *              "participants": ["5bdffb8653618745c0bba83f","5bdffb3d53618745c0bba83e"]
+ *              "location": {
+ *                  "x": 6.8394017,
+ *                  "y": 46.464769
+ *              }
  *          }
  *      ]
  *  }
@@ -180,8 +216,11 @@ router.get('/', (req, res, next) => {
  * @apiParam {String}   recipeId        Recipe's id
  * @apiParam {DateTime} date            Date
  * @apiParam {String[]} participants    Participating users
+ * @apiParam {Object}   location        Location of the meal
+ * @apiParam {Number}   location.x      x coordinate
+ * @apiParam {Number}   location.y      y coordinate
  *
- * @apiParamExample Response example
+ * @apiParamExample Request example
  *  {
  *      "date": "2020-08-05T07:12:54"
  *  }
@@ -191,6 +230,9 @@ router.get('/', (req, res, next) => {
  * @apiSuccess (201) {String}   recipeId        Recipe's id
  * @apiSuccess (201) {DateTime} date            Date
  * @apiSuccess (201) {String[]} participants    Participating users
+ * @apiSuccess (201) {Object}   location        Location of the meal
+ * @apiSuccess (201) {Number}   location.x      x coordinate
+ * @apiSuccess (201) {Number}   location.y      y coordinate
  *
  * @apiSuccessExample Response example
  * HTTP/1.1 200 OK
@@ -199,7 +241,11 @@ router.get('/', (req, res, next) => {
  *     "groupId": "5bbb621c4d7da43f508b9d5a",
  *     "recipeId": "7ddd897c4d7da43f508b9d5a",
  *     "date": "2020-08-05T07:12:54.000Z",
- *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"]
+ *     "participants": ["5bbb621c4d7da43f508b9d5a", "5bbb61284d7da43f508b9d59"],
+ *     "location": {
+ *          "x": 6.8394017,
+ *          "y": 46.464769
+ *      }
  * }
  *
  * @apiError (404)  MealNotFound            Meal was not found
@@ -249,6 +295,8 @@ router.patch('/:id', findMealById, (req, res, next) => {
             return resolve();
         });
     });
+
+    meal.location = location;
 
     Promise.all([checkGroup, checkRecipe]).then(() => {
         meal.save((err, updatedMeal) => {
